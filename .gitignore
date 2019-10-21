@@ -1,0 +1,9 @@
+docker-compose.yml
+phpunit.xml
+composer.phar
+composer.lock
+composer-test.lock
+vendor/
+docker/
+tests/build/
+.idea
