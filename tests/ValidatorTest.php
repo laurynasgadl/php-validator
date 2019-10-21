@@ -95,7 +95,7 @@ class ValidatorTest extends TestCase
 
         $params = [
             'test' => [
-                'test'  => 123,
+                'test'  => -10,
                 'test1' => 'test',
                 'test2' => 1.1,
             ]
@@ -103,7 +103,7 @@ class ValidatorTest extends TestCase
 
         $result = $validator->validate([
             'test'       => 'array|required',
-            'test.test'  => 'integer|required|min:100|max:125|between:1,125',
+            'test.test'  => 'integer|required|min:-100|max:125|between:-25,125',
             'test.test1' => 'string|required|size:4',
             'test.test2' => 'float|required',
             'test.test3' => 'float',
