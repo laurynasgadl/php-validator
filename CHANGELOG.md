@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1] - 2019-10-22
+### Added
+- Boolean rule
+### Updated
+- Default `Context` handler package
+- README.md
+
 ## [1.0.0] - 2019-10-21
 ### Added
 - Initial release
