@@ -58,7 +58,7 @@ $validator = new Validator();
 
 $params = ['test' => 123];
 $result = $validator->validate([
-    'test' => new MockRule(),
+    'test' => new CustomRule(),
 ], $params);
 ```
 
