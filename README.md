@@ -10,24 +10,24 @@ use Luur\Validator\Exceptions\ValidationFailed;
 $validator = new Validator();
 
 $rules = [
-    'client_id' => 'required|integer',
-    'amount' => [new RequiredRule(), new MinRule(0)],
-    'count' => 'between:-12,50',
-    'details' => 'array|required',
+    'client_id'    => 'required|integer',
+    'amount'       => [new RequiredRule(), new MinRule(0)],
+    'count'        => 'between:-12,50',
+    'details'      => 'array|required',
     'details.name' => 'string|required',
 ];
 
 $params = [
     'client_id' => 12345,
-    'amount' => 1234,
-    'details' => [
-        'name' => 'John Doe',
+    'amount'    => 1234,
+    'details'   => [
+        'name'  => 'John Doe',
     ],
 ];
 
 try {
     $validator->validate($rules, $params);
-catch (ValidationFailed:: $exception) {
+catch (ValidationFailed $exception) {
     var_dump($validator->getErrors());
 }
 ```
