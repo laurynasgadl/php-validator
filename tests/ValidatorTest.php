@@ -15,7 +15,7 @@ class ValidatorTest extends TestCase
 {
     public function testSortsRules()
     {
-        $validator = new ValidatorMock();
+        $validator = $this->createValidatorMock();
 
         $params = [];
         $rules  = [
@@ -38,7 +38,7 @@ class ValidatorTest extends TestCase
 
     public function testResolvesRuleSetInOrder()
     {
-        $validator = new ValidatorMock();
+        $validator = $this->createValidatorMock();
 
         $params = ['test' => 'test'];
         $rules  = ['test' => 'integer|required'];
@@ -48,7 +48,7 @@ class ValidatorTest extends TestCase
 
         $ruleArray = $validator->mockParseRuleSetArray(array_shift($rules));
 
-        $context = new Context();
+        $context      = new Context();
         $requiredRule = new RequiredRule();
         $requiredRule->setContext($context);
         $integerRule = new IntegerRule();
@@ -62,14 +62,14 @@ class ValidatorTest extends TestCase
 
     public function testSetsContextHandler()
     {
-        $validator = new ValidatorMock();
+        $validator = $this->createValidatorMock();
         $validator->setContextHandler(new Context());
     }
 
     public function testThrowsValidationFailedError()
     {
         $this->expectException(ValidationFailed::class);
-        $validator = new ValidatorMock();
+        $validator = $this->createValidatorMock();
         $validator->validate([
             'test' => 'integer|required',
         ], ['test' => 'test']);
@@ -91,7 +91,7 @@ class ValidatorTest extends TestCase
 
     public function testValidatesArrayParams()
     {
-        $validator = new Validator();
+        $validator = $this->createValidator();
 
         $params = [
             'test' => [
@@ -114,19 +114,19 @@ class ValidatorTest extends TestCase
 
     public function testValidatesWithVariousRuleDefinitions()
     {
-        $validator = new Validator();
+        $validator = $this->createValidator();
 
         $params = [
             'test' => [
                 'test'  => 123,
-                'test1'  => 123,
+                'test1' => 123,
             ]
         ];
 
         $result = $validator->validate([
             'test'       => ['array', new RequiredRule()],
             'test.test'  => new IntegerRule(),
-            'test.test1'  => 'min:100',
+            'test.test1' => 'min:100',
         ], $params);
 
         $this->assertEquals($result, $params);
@@ -134,17 +134,61 @@ class ValidatorTest extends TestCase
 
     public function testValidatesWithCustomRule()
     {
-        $validator = new Validator();
+        $validator = $this->createValidator();
 
         $params = ['test' => 123];
         $result = $validator->validate([
-            'test'       => new MockRule(),
+            'test' => new MockRule(),
         ], $params);
         $this->assertEquals($result, $params);
     }
+
+    public function testValidatesWildcardPaths()
+    {
+        $validator = $this->createValidator();
+
+        $params = [
+            'test_unassoc' => [
+                [
+                    'id' => 1,
+                ],
+                [
+                    'id' => 2,
+                ],
+            ],
+            'test_assoc'   => [
+                '1' => [
+                    'id' => 3,
+                ],
+                '2' => [
+                    'name' => 'test',
+                ],
+                '3' => [],
+            ],
+        ];
+
+        $result = $validator->validate([
+            '*.*.id'            => new IntegerRule(),
+            'test_assoc.2.name' => 'string',
+            '*.2'               => 'array',
+        ], $params);
+
+        $this->assertEquals($result, $params);
+    }
+
+    public function createValidator()
+    {
+        return new Validator();
+    }
+
+    public function createValidatorMock()
+    {
+        return new ValidatorMock();
+    }
 }
 
-class MockRule extends AbstractRule {
+class MockRule extends AbstractRule
+{
     /**
      * @param mixed $value
      * @return bool
