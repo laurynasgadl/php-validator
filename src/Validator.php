@@ -12,6 +12,16 @@ use Luur\Validator\Rules\RuleFactory;
 
 class Validator
 {
+    const PATH_DELIMITER = '.';
+
+    const PATH_WILDCARD_DELIMITER = '*';
+
+    const RULE_DELIMITER = '|';
+
+    const RULE_ARG_DELIMITER = ':';
+
+    const RULE_PARAM_DELIMITER = ',';
+
     /**
      * @var array
      */
@@ -104,15 +114,19 @@ class Validator
     protected function validateRule($key, array $rules)
     {
         foreach ($rules as $rule) {
-            if (!$this->valueRequiresValidation($key, $rules)) {
-                continue;
-            }
+            $keys = $this->expandKey($key);
 
-            /**
-             * @var AbstractRule $rule
-             */
-            if (!$rule->passesByKey($key)) {
-                $this->addError($key, $rule);
+            foreach ($keys as $expandedKey) {
+                if (!$this->valueRequiresValidation($expandedKey, $rules)) {
+                    continue;
+                }
+
+                /**
+                 * @var AbstractRule $rule
+                 */
+                if (!$rule->passesByKey($expandedKey)) {
+                    $this->addError($expandedKey, $rule);
+                }
             }
         }
     }
@@ -164,7 +178,7 @@ class Validator
     protected function sortRules()
     {
         $parser = function ($a) {
-            return count(explode('.', $a));
+            return count(explode(self::PATH_DELIMITER, $a));
         };
 
         $sort = function ($a, $b) use ($parser) {
@@ -203,11 +217,11 @@ class Validator
 
         foreach ($rules as $rule) {
             if (is_string($rule)) {
-                $ruleArgs = explode(':', $rule);
+                $ruleArgs = explode(self::RULE_ARG_DELIMITER, $rule);
                 $ruleSlug = array_shift($ruleArgs);
 
                 if (count($ruleArgs) > 0) {
-                    $ruleArgs = explode(',', $ruleArgs[0]);
+                    $ruleArgs = explode(self::RULE_PARAM_DELIMITER, $ruleArgs[0]);
                 }
 
                 $ruleSet[] = RuleFactory::build($this->contextHandler, $ruleSlug, $ruleArgs);
@@ -229,7 +243,7 @@ class Validator
     protected function parseRuleSetArray($ruleSet)
     {
         if (is_string($ruleSet)) {
-            $ruleSet = explode('|', $ruleSet);
+            $ruleSet = explode(self::RULE_DELIMITER, $ruleSet);
         }
 
         if ($ruleSet instanceof AbstractRule) {
@@ -261,5 +275,47 @@ class Validator
     public function getErrors()
     {
         return $this->errorBag;
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     */
+    protected function expandKey($key)
+    {
+        $parts = explode(self::PATH_DELIMITER, $key);
+        return $this->findKeys($this->contextHandler->toArray(), $parts);
+    }
+
+    /**
+     * @param array $data
+     * @param array $parts
+     * @param string|null $currentPath
+     * @return array
+     */
+    protected function findKeys($data, $parts, $currentPath = null)
+    {
+        if (count($parts) < 1) {
+            return [$currentPath];
+        }
+
+        $current = array_shift($parts);
+
+        if ($current == self::PATH_WILDCARD_DELIMITER) {
+            $paths = array_keys($data);
+        } else {
+            $paths = [$current];
+        }
+
+        $keys = [];
+
+        foreach ($paths as $path) {
+            if (array_key_exists($path, $data)) {
+                $nextPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
+                $keys     = array_merge($this->findKeys($data[$path], $parts, $nextPath), $keys);
+            }
+        }
+
+        return $keys;
     }
 }
