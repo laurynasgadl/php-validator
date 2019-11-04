@@ -163,12 +163,14 @@ class ValidatorTest extends TestCase
                 '2' => [
                     'name' => 'test',
                 ],
+                '3' => [],
             ],
         ];
 
         $result = $validator->validate([
             '*.*.id'            => new IntegerRule(),
             'test_assoc.2.name' => 'string',
+            '*.2'               => 'array',
         ], $params);
 
         $this->assertEquals($result, $params);
