@@ -14,7 +14,7 @@ $rules = [
     'amount'       => [new RequiredRule(), new MinRule(0)],
     'count'        => 'between:-12,50',
     'details'      => 'array|required',
-    'details.name' => 'string|required',
+    '*.name'       => 'string|required',
 ];
 
 $params = [
