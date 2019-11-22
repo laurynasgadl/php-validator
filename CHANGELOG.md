@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.3] - 2019-11-22
+### Fixed
+- Required nested params being validated in a non-required array
+
 ## [1.1.2] - 2019-11-22
 ### Updated
 - Validation error bag display

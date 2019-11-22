@@ -70,7 +70,7 @@ class ValidatorTest extends TestCase
     public function testThrowsValidationFailedError()
     {
         $this->expectException(ValidationFailed::class);
-        $validator = $this->createValidatorMock();
+        $validator = $this->createValidator();
         $validator->validate([
             'test' => 'integer|required',
         ], ['test' => 'test']);
@@ -240,7 +240,30 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator();
         $validator->validate($rules, $params);
+    }
 
+    public function testSkipsNestedRequiredParams()
+    {
+        $rules  = [
+            'arg_1'       => 'required|array',
+            'arg_1.arg_1' => 'integer',
+            'arg_2'       => 'array',
+            'arg_2.arg_1' => 'required|string',
+            'arg_3'       => 'array',
+            'arg_3.arg_1' => 'required|string',
+        ];
+        $params = [
+            'arg_1' => [
+                'arg_1' => 1,
+            ],
+            'arg_3' => [
+                'arg_1' => 'test',
+            ],
+        ];
+
+        $validator = new Validator();
+        $result    = $validator->validate($rules, $params);
+        $this->assertEquals($params, $result);
     }
 
     public function createValidator()
