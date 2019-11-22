@@ -37,9 +37,13 @@ class Validator
      */
     protected $errorBag = [];
 
-    public function __construct()
+    /**
+     * Validator constructor.
+     * @param ContextInterface|null $context
+     */
+    public function __construct($context = null)
     {
-        $this->contextHandler = new Context();
+        $this->contextHandler = $context ? : new Context();
     }
 
     /**
@@ -313,6 +317,8 @@ class Validator
             if (array_key_exists($path, $data)) {
                 $nextPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
                 $keys     = array_merge($this->findKeys($data[$path], $parts, $nextPath), $keys);
+            } else {
+                $keys[] = $path;
             }
         }
 

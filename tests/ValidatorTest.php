@@ -3,6 +3,7 @@
 namespace Luur\Validator\Tests;
 
 use Luur\Validator\Context;
+use Luur\Validator\ContextInterface;
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\ValidationFailed;
 use Luur\Validator\Rules\AbstractRule;
@@ -176,6 +177,30 @@ class ValidatorTest extends TestCase
         $this->assertEquals($result, $params);
     }
 
+    public function testValidatesEmptyParamsWithRequiredRule()
+    {
+        $this->expectException(ValidationFailed::class);
+
+        $validator = $this->createValidator();
+        $validator->validate([
+            'test'  => 'required|integer',
+            'test2' => 'required|string',
+            'test3' => 'required|float',
+        ], []);
+    }
+
+    public function testSetsDefaultContextHandler()
+    {
+        $validator = new ValidatorMock();
+        $this->assertTrue($validator->getContextHandler() instanceof Context);
+    }
+
+    public function testSetsMockContextHandler()
+    {
+        $validator = new ValidatorMock(new ContextMock());
+        $this->assertTrue($validator->getContextHandler() instanceof ContextMock);
+    }
+
     public function createValidator()
     {
         return new Validator();
@@ -184,6 +209,44 @@ class ValidatorTest extends TestCase
     public function createValidatorMock()
     {
         return new ValidatorMock();
+    }
+}
+
+class ContextMock implements ContextInterface
+{
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params)
+    {
+        echo 'Setting params';
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $key;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
+     */
+    public function set($key, $value)
+    {
+        return $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return [];
     }
 }
 
@@ -221,6 +284,11 @@ class ValidatorMock extends Validator
         return $this->params = $params;
     }
 
+    public function mockParseRuleSetArray($rule)
+    {
+        return $this->parseRuleSetArray($rule);
+    }
+
     /**
      * @param $array
      * @return array
@@ -231,8 +299,11 @@ class ValidatorMock extends Validator
         return $this->resolveRuleSet($array);
     }
 
-    public function mockParseRuleSetArray($rule)
+    /**
+     * @return ContextInterface
+     */
+    public function getContextHandler()
     {
-        return $this->parseRuleSetArray($rule);
+        return $this->contextHandler;
     }
 }

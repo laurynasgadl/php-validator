@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.1] - 2019-11-22
+### Added
+- Ability to pass default context handler to constructor
+### Fixed
+- Empty array of params not being validated
+
+## [1.1.0] - 2019-10-04
+### Added
+- Wildcard support
+
 ## [1.0.1] - 2019-10-22
 ### Added
 - Boolean rule
