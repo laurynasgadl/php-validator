@@ -168,7 +168,7 @@ class Validator
      */
     protected function addError($key, $rule)
     {
-        $this->errorBag[$key] = $rule->getSignature();
+        $this->errorBag[$key][] = $rule->getSignature();
     }
 
     /**
@@ -318,7 +318,7 @@ class Validator
                 $nextPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
                 $keys     = array_merge($this->findKeys($data[$path], $parts, $nextPath), $keys);
             } else {
-                $keys[] = $path;
+                $keys[] = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
             }
         }
 

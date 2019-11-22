@@ -17,7 +17,7 @@ class ValidationFailed extends Exception
      */
     protected function formatErrorBag(array $errorBag) {
         return implode(',', array_map(function ($v, $k) {
-                    return $k.'->'.$v;
+                return $k . '->' . implode('|', $v);
                 }, $errorBag, array_keys($errorBag)
             )
         );

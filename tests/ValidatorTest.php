@@ -78,7 +78,7 @@ class ValidatorTest extends TestCase
 
     public function testReturnsFailingValidation()
     {
-        $validator = new ValidatorMock();
+        $validator = $this->createValidator();
 
         try {
             $validator->validate([
@@ -87,7 +87,7 @@ class ValidatorTest extends TestCase
         } catch (ValidationFailed $exception) {
         }
 
-        $this->assertEquals(['test' => IntegerRule::getSlug()], $validator->getErrors());
+        $this->assertEquals(['test' => [IntegerRule::getSlug()]], $validator->getErrors());
     }
 
     public function testValidatesArrayParams()
@@ -199,6 +199,48 @@ class ValidatorTest extends TestCase
     {
         $validator = new ValidatorMock(new ContextMock());
         $this->assertTrue($validator->getContextHandler() instanceof ContextMock);
+    }
+
+    public function testValidatesNestedValues()
+    {
+        $rules = [
+            'arg_3'         => 'required|array',
+            'arg_5'         => 'required|array',
+            'arg_5.arg_3'   => 'string',
+            'arg_1'         => 'required|array',
+            'arg_1.*.arg_1' => 'string',
+        ];
+
+        $params = [
+            'arg_1' => [],
+            'arg_3' => ['test'],
+            'arg_5' => [],
+        ];
+
+        $validator = new Validator();
+        $result    = $validator->validate($rules, $params);
+
+        $this->assertEquals($result, $params);
+    }
+
+    public function testValidatesNestedEmptyValues()
+    {
+        $this->expectException(ValidationFailed::class);
+        $this->expectExceptionMessage('Validation failed: arg_2.0.arg_1->required|string');
+
+        $rules = [
+            'arg_2.*.arg_1' => 'required|string',
+        ];
+
+        $params = [
+            'arg_2' => [
+                [],
+            ],
+        ];
+
+        $validator = new Validator();
+        $validator->validate($rules, $params);
+
     }
 
     public function createValidator()

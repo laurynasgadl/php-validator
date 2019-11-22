@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.2] - 2019-11-22
+### Updated
+- Validation error bag display
+### Fixed
+- Nested wildcard param routing
+
 ## [1.1.1] - 2019-11-22
 ### Added
 - Ability to pass default context handler to constructor
