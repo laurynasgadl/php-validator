@@ -7,7 +7,8 @@ use Exception;
 
 class ValidationFailed extends Exception
 {
-    public function __construct(array $errorBag = []) {
+    public function __construct($errorBag = [])
+    {
         parent::__construct('Validation failed: ' . $this->formatErrorBag($errorBag));
     }
 
@@ -15,7 +16,8 @@ class ValidationFailed extends Exception
      * @param array $errorBag
      * @return string
      */
-    protected function formatErrorBag(array $errorBag) {
+    protected function formatErrorBag($errorBag)
+    {
         return implode(',', array_map(function ($v, $k) {
                 return $k . '->' . implode('|', $v);
                 }, $errorBag, array_keys($errorBag)

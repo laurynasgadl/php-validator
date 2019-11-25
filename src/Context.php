@@ -4,6 +4,7 @@
 namespace Luur\Validator;
 
 
+use Luur\Exceptions\BranchNotFoundException;
 use Luur\Travers;
 
 class Context implements ContextInterface
@@ -13,7 +14,7 @@ class Context implements ContextInterface
      */
     protected $params;
 
-    public function __construct(array $params = [])
+    public function __construct($params = [])
     {
         $this->params = new Travers($params);
     }
@@ -21,6 +22,7 @@ class Context implements ContextInterface
     /**
      * @param string $key
      * @return null
+     * @throws BranchNotFoundException
      */
     public function get($key)
     {
@@ -47,7 +49,7 @@ class Context implements ContextInterface
     /**
      * @param array $params
      */
-    public function setParams(array $params)
+    public function setParams($params)
     {
         $this->params = new Travers($params);
     }

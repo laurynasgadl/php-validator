@@ -9,7 +9,7 @@ interface ContextInterface
     /**
      * @param array $params
      */
-    public function setParams(array $params);
+    public function setParams($params);
 
     /**
      * @param string $key

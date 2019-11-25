@@ -18,7 +18,6 @@ class ValidatorTest extends TestCase
     {
         $validator = $this->createValidatorMock();
 
-        $params = [];
         $rules  = [
             'test.test'      => 'test',
             'test1'          => 'test',
@@ -27,11 +26,7 @@ class ValidatorTest extends TestCase
             'test3'          => 'test',
         ];
 
-        $validator->setRules($rules);
-        $validator->setParams($params);
-        $validator->mockSortRules();
-
-        $sorted = $validator->getRules();
+        $sorted = $validator->mockSortRules($rules);
 
         $this->assertEquals(['test.test.test' => 'test'], array_slice($sorted, -1, 1));
         $this->assertEquals(['test.test' => 'test'], array_slice($sorted, -2, 1));
@@ -50,6 +45,7 @@ class ValidatorTest extends TestCase
         $ruleArray = $validator->mockParseRuleSetArray(array_shift($rules));
 
         $context      = new Context();
+        $context->setParams($params);
         $requiredRule = new RequiredRule();
         $requiredRule->setContext($context);
         $integerRule = new IntegerRule();
@@ -282,7 +278,7 @@ class ContextMock implements ContextInterface
     /**
      * @param array $params
      */
-    public function setParams(array $params)
+    public function setParams($params)
     {
         echo 'Setting params';
     }
@@ -329,9 +325,9 @@ class MockRule extends AbstractRule
 
 class ValidatorMock extends Validator
 {
-    public function mockSortRules()
+    public function mockSortRules($rules)
     {
-        $this->sortRules();
+        return $this->sortRules($rules);
     }
 
     public function getRules()
@@ -339,14 +335,14 @@ class ValidatorMock extends Validator
         return $this->rules;
     }
 
-    public function setRules(array $rules)
+    public function setRules($rules)
     {
         return $this->rules = $rules;
     }
 
-    public function setParams(array $params)
+    public function setParams($params)
     {
-        return $this->params = $params;
+        $this->contextHandler->setParams($params);
     }
 
     public function mockParseRuleSetArray($rule)

@@ -4,6 +4,7 @@
 namespace Luur\Validator;
 
 
+use Exception;
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\ValidationFailed;
 use Luur\Validator\Rules\AbstractRule;
@@ -26,11 +27,6 @@ class Validator
      * @var array
      */
     protected $rules;
-
-    /**
-     * @var array
-     */
-    protected $skipRules;
 
     /**
      * @var ContextInterface
@@ -56,17 +52,16 @@ class Validator
      * @param array $params
      * @return array
      * @throws InvalidRule
-     * @throws ValidationFailed
+     * @throws Exception
      */
-    public function validate(array $rules, array $params)
+    public function validate($rules, $params)
     {
         $this->emptyErrorBag();
 
         $this->setRules($rules);
         $this->setParams($params);
 
-        $this->sortRules();
-        $this->validateRules();
+        $this->validateParams($this->sortRules($rules));
 
         return $this->getParams();
     }
@@ -87,65 +82,72 @@ class Validator
     /**
      * @param array $rules
      */
-    protected function setRules(array $rules)
+    protected function setRules($rules)
     {
-        $this->rules     = $rules;
-        $this->skipRules = [];
+        $this->rules = $rules;
     }
 
     /**
      * @param array $params
      */
-    protected function setParams(array $params)
+    protected function setParams($params)
     {
         $this->contextHandler->setParams($params);
     }
 
     /**
+     * @param array $rules
      * @throws InvalidRule
-     * @throws ValidationFailed
+     * @throws Exception
      */
-    protected function validateRules()
+    protected function validateParams($rules)
     {
-        foreach ($this->rules as $key => $ruleSet) {
-            if (in_array($key, $this->skipRules)) {
+        $skipKeys = [];
+
+        foreach ($rules as $key => $ruleSet) {
+            if (in_array($key, $skipKeys)) {
                 continue;
             }
 
-            $keys     = $this->expandKey($key);
-            $resolved = $this->resolveRuleSet($this->parseRuleSetArray($ruleSet));
+            $resolvedRules = $this->resolveRuleSet($this->parseRuleSetArray($ruleSet));
 
-            foreach ($keys as $expandedKey) {
-                if ($this->valueRequiresValidation($expandedKey, $resolved)) {
-                    $this->validateRule($expandedKey, $resolved);
+            foreach ($this->expandKey($key, $this->contextHandler->toArray()) as $expandedKey) {
+                if ($this->valueRequiresValidation($this->contextHandler->get($expandedKey), $resolvedRules)) {
+                    $this->validateRules($expandedKey, $resolvedRules);
 
                     if ($this->containsErrors()) {
                         throw new ValidationFailed($this->errorBag);
                     }
                 } else {
-                    $this->setSkipRules($expandedKey);
+                    $skipKeys = $this->getRelatedKeys($rules, $expandedKey);
                 }
             }
         }
     }
 
     /**
+     * @param array $rules
      * @param string $expandedKey
+     * @return array
      */
-    protected function setSkipRules($expandedKey)
+    protected function getRelatedKeys($rules, $expandedKey)
     {
-        foreach ($this->rules as $key => $ruleSet) {
+        $keys = [];
+
+        foreach ($rules as $key => $ruleSet) {
             if (substr($key, 0, strlen($expandedKey)) === $expandedKey) {
-                $this->skipRules[] = $key;
+                $keys[] = $key;
             }
         }
+
+        return $keys;
     }
 
     /**
      * @param string $expandedKey
      * @param array $rules
      */
-    protected function validateRule($expandedKey, array $rules)
+    protected function validateRules($expandedKey, $rules)
     {
         foreach ($rules as $rule) {
             /**
@@ -158,30 +160,23 @@ class Validator
     }
 
     /**
-     * @param $key
-     * @param $rules
+     * @param mixed $value
+     * @param array $resolvedRules
      * @return bool
      */
-    protected function valueRequiresValidation($key, $rules)
+    protected function valueRequiresValidation($value, $resolvedRules)
     {
-        $value = $this->contextHandler->get($key);
-
         if ($value !== null) {
             return true;
         }
 
-        $requiredRuleSet = false;
-
-        foreach ($rules as $rule) {
-            /**
-             * @var AbstractRule $rule
-             */
-            if ($rule::getSlug() == RequiredRule::getSlug()) {
-                $requiredRuleSet = true;
+        foreach ($resolvedRules as $rule) {
+            if ($rule instanceof RequiredRule) {
+                return true;
             }
         }
 
-        return $requiredRuleSet;
+        return false;
     }
 
     /**
@@ -201,35 +196,40 @@ class Validator
         return !empty($this->errorBag);
     }
 
-    protected function sortRules()
+    /**
+     * @param array $rules
+     * @return array
+     */
+    protected function sortRules($rules)
     {
         $parser = function ($a) {
             return count(explode(self::PATH_DELIMITER, $a));
         };
 
-        $sort = function ($a, $b) use ($parser) {
+        uksort($rules, function ($a, $b) use ($parser) {
             $aCount = $parser($a);
             $bCount = $parser($b);
             return $aCount > $bCount;
-        };
+        });
 
-        uksort($this->rules, $sort);
+        return $rules;
     }
 
     /**
      * @param array $rulesSet
+     * @return array
      */
-    protected function sortRuleSet(&$rulesSet)
+    protected function sortRuleSet($rulesSet)
     {
-        $sort = function ($a, $b) {
+        usort($rulesSet, function ($a, $b) {
             /**
              * @var AbstractRule $a
              * @var AbstractRule $b
              */
             return $a->getPrecedence() < $b->getPrecedence();
-        };
+        });
 
-        usort($rulesSet, $sort);
+        return $rulesSet;
     }
 
     /**
@@ -257,9 +257,7 @@ class Validator
             }
         }
 
-        $this->sortRuleSet($ruleSet);
-
-        return $ruleSet;
+        return $this->sortRuleSet($ruleSet);
     }
 
     /**
@@ -305,12 +303,12 @@ class Validator
 
     /**
      * @param string $key
+     * @param array $context
      * @return array
      */
-    protected function expandKey($key)
+    protected function expandKey($key, $context)
     {
-        $parts = explode(self::PATH_DELIMITER, $key);
-        return $this->findKeys($this->contextHandler->toArray(), $parts);
+        return $this->findKeys($context, explode(self::PATH_DELIMITER, $key));
     }
 
     /**
@@ -336,11 +334,11 @@ class Validator
         $keys = [];
 
         foreach ($paths as $path) {
+            $resolvedPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
             if (array_key_exists($path, $data)) {
-                $nextPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
-                $keys     = array_merge($this->findKeys($data[$path], $parts, $nextPath), $keys);
+                $keys = array_merge($this->findKeys($data[$path], $parts, $resolvedPath), $keys);
             } else {
-                $keys[] = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
+                $keys[] = $resolvedPath;
             }
         }
 
