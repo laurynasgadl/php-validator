@@ -61,14 +61,18 @@ abstract class AbstractRule
     {
         $addon = null;
 
-        $params = implode(',', array_filter(get_object_vars($this), function ($key) {
+        $params = array_filter(get_object_vars($this), function ($key) {
             return !in_array($key, [
                 'precedence', 'context',
             ]);
-        }, ARRAY_FILTER_USE_KEY));
+        }, ARRAY_FILTER_USE_KEY);
 
-        if ($params) {
-            $addon = ':' . $params;
+        $values = array_map(function ($value) {
+            return is_array($value) ? implode(',', $value) : $value;
+        }, $params);
+
+        if ($values) {
+            $addon = ':' . implode(',', $values);
         }
 
         return self::getSlug() . $addon;

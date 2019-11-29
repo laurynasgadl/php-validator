@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.4] - 2019-11-29
+### Added
+- RequiredWithout rule
+
 ## [1.1.3] - 2019-11-22
 ### Fixed
 - Required nested params being validated in a non-required array

@@ -65,17 +65,19 @@ $result = $validator->validate([
 #### Existing rules
 `array` : the value needs to be an array
 
-`between:0,10` : the value needs to be between the given range
+`between:{from_size},{to_size}` : the value needs to be between the given range
 
 `float` : the value needs to be a float
 
 `integer` : the value needs to be an integer
 
-`max:100` : the value needs to be less or equal to the given amount
+`max:{max_size}` : the value needs to be less or equal to the given amount
 
-`min:100` : the value needs to be greater or equal to the given amount
+`min:{min_size}` : the value needs to be greater or equal to the given amount
 
 `required` : the parameter needs to exist in the data set
+
+`required_without:{param_1},{param_2}...` : the parameter needs to exist in the data set if one of the other parameters do not exist
 
 `size` : the size of the value needs to be equal to the given amount. The size of a string is its length, the size of an array is the number of elements inside it, the size of a boolean is 0 or 1.
 

@@ -9,6 +9,7 @@ use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\ValidationFailed;
 use Luur\Validator\Rules\AbstractRule;
 use Luur\Validator\Rules\Concrete\RequiredRule;
+use Luur\Validator\Rules\Concrete\RequiredWithoutRule;
 use Luur\Validator\Rules\RuleFactory;
 
 class Validator
@@ -171,7 +172,7 @@ class Validator
         }
 
         foreach ($resolvedRules as $rule) {
-            if ($rule instanceof RequiredRule) {
+            if ($rule instanceof RequiredRule || $rule instanceof RequiredWithoutRule) {
                 return true;
             }
         }

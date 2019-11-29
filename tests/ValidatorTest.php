@@ -18,7 +18,7 @@ class ValidatorTest extends TestCase
     {
         $validator = $this->createValidatorMock();
 
-        $rules  = [
+        $rules = [
             'test.test'      => 'test',
             'test1'          => 'test',
             'test2'          => 'test',
@@ -44,7 +44,7 @@ class ValidatorTest extends TestCase
 
         $ruleArray = $validator->mockParseRuleSetArray(array_shift($rules));
 
-        $context      = new Context();
+        $context = new Context();
         $context->setParams($params);
         $requiredRule = new RequiredRule();
         $requiredRule->setContext($context);
@@ -260,6 +260,37 @@ class ValidatorTest extends TestCase
         $validator = new Validator();
         $result    = $validator->validate($rules, $params);
         $this->assertEquals($params, $result);
+    }
+
+    public function testValidatesRequiredWithoutRule()
+    {
+        $rules  = [
+            'arg_1' => 'required_without:arg_2,arg_3',
+        ];
+        $params = [
+            'arg_2' => null,
+            'arg_3' => 'test',
+        ];
+
+        $validator = new Validator();
+        $result    = $validator->validate($rules, $params);
+        $this->assertEquals($params, $result);
+    }
+
+    public function testThrowsRequiredWithoutRuleException()
+    {
+        $this->expectException(ValidationFailed::class);
+        $this->expectExceptionMessage('Validation failed: arg_1->required_without:arg_2,arg_3');
+
+        $rules  = [
+            'arg_1' => 'required_without:arg_2,arg_3',
+        ];
+        $params = [
+            'arg_3' => null,
+        ];
+
+        $validator = new Validator();
+        $validator->validate($rules, $params);
     }
 
     public function createValidator()
