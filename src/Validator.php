@@ -52,7 +52,6 @@ class Validator
      * @param array $rules
      * @param array $params
      * @return array
-     * @throws InvalidRule
      * @throws Exception
      */
     public function validate($rules, $params)
@@ -98,7 +97,6 @@ class Validator
 
     /**
      * @param array $rules
-     * @throws InvalidRule
      * @throws Exception
      */
     protected function validateParams($rules)
