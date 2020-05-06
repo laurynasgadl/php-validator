@@ -265,7 +265,7 @@ class ValidatorTest extends TestCase
     public function testValidatesRequiredWithoutRule()
     {
         $rules  = [
-            'arg_1' => 'required_without:arg_2,arg_3',
+            'arg_1' => 'required_without:arg_2,arg_3|string',
         ];
         $params = [
             'arg_2' => null,

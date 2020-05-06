@@ -93,6 +93,19 @@ class RequiredWithoutTest extends TestCase
         $this->assertFalse($rule->passesByKey($key));
     }
 
+    /**
+     * @dataProvider passingDataProvider
+     * @param Context $context
+     * @param array $params
+     * @param string $key
+     */
+    public function testPassesRule($context, $params, $key)
+    {
+        $rule = new RequiredWithoutRule(...$params);
+        $rule->setContext($context);
+        $this->assertTrue($rule->passesByKey($key));
+    }
+
     public function testGetsSlug()
     {
         $this->assertEquals('required_without', RequiredWithoutRule::getSlug());

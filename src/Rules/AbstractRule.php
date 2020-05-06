@@ -71,7 +71,7 @@ abstract class AbstractRule
             return is_string($value) ||
                    is_numeric($value) ||
                    is_bool($value) ?
-                $value : null;
+                $value : (is_array($value) ? implode(',', $value) : null);
         }, $params);
 
         $values = array_filter($values, function ($value) {

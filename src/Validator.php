@@ -154,6 +154,12 @@ class Validator
              */
             if (!$rule->passesByKey($expandedKey)) {
                 $this->addError($expandedKey, $rule);
+            } else {
+                // If the required_without rule passes when the value is null,
+                // all the following rules should be skipped
+                if ($rule instanceof RequiredWithoutRule && $this->contextHandler->get($expandedKey) == null) {
+                    break;
+                }
             }
         }
     }
