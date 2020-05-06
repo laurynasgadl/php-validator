@@ -5,6 +5,7 @@ namespace Luur\Validator\Tests\Rules;
 use Luur\Validator\Context;
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Rules\AbstractRule;
+use Luur\Validator\Rules\Concrete\NumericRule;
 use Luur\Validator\Rules\RuleFactory;
 use PHPUnit\Framework\TestCase;
 
@@ -20,5 +21,11 @@ class RuleFactoryTest extends TestCase
     {
         $this->expectException(InvalidRule::class);
         RuleFactory::build(new Context(), 'test');
+    }
+
+    public function testBuildsNumericRule()
+    {
+        $rule = RuleFactory::build(new Context(), 'numeric');
+        $this->assertTrue($rule instanceof NumericRule);
     }
 }

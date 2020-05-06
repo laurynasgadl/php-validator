@@ -41,6 +41,7 @@ catch (ValidationFailed $exception) {
 #### Custom rules
 
 ```php
+use Luur\Validator\Rules\AbstractRule;
 use Luur\Validator\Validator;
 
 class CustomRule extends AbstractRule {
@@ -84,3 +85,5 @@ $result = $validator->validate([
 `string` : the value needs to be a string
 
 `boolean` : the value needs to be a boolean
+
+`numeric` : the value needs to be a numeric

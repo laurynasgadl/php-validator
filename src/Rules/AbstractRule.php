@@ -68,8 +68,15 @@ abstract class AbstractRule
         }, ARRAY_FILTER_USE_KEY);
 
         $values = array_map(function ($value) {
-            return is_array($value) ? implode(',', $value) : $value;
+            return is_string($value) ||
+                   is_numeric($value) ||
+                   is_bool($value) ?
+                $value : null;
         }, $params);
+
+        $values = array_filter($values, function ($value) {
+            return $value !== null;
+        });
 
         if ($values) {
             $addon = ':' . implode(',', $values);
