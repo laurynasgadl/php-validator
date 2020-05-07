@@ -4,12 +4,10 @@
 namespace Luur\Validator;
 
 
-use Exception;
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\ValidationFailed;
+use Luur\Validator\Exceptions\ValidatorException;
 use Luur\Validator\Rules\AbstractRule;
-use Luur\Validator\Rules\Concrete\RequiredRule;
-use Luur\Validator\Rules\Concrete\RequiredWithoutRule;
 use Luur\Validator\Rules\RuleFactory;
 
 class Validator
@@ -52,7 +50,7 @@ class Validator
      * @param array $rules
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws ValidatorException
      */
     public function validate($rules, $params)
     {
@@ -61,7 +59,7 @@ class Validator
         $this->setRules($rules);
         $this->setParams($params);
 
-        $this->validateParams($this->sortRules($rules));
+        $this->execValidation($this->sortRules($rules));
 
         return $this->getParams();
     }
@@ -96,72 +94,58 @@ class Validator
     }
 
     /**
-     * @param array $rules
-     * @throws Exception
+     * @param array $ruleSet
+     * @throws ValidatorException
      */
-    protected function validateParams($rules)
+    protected function execValidation($ruleSet)
     {
-        $skipKeys = [];
-
-        foreach ($rules as $key => $ruleSet) {
-            if (in_array($key, $skipKeys)) {
+        $skippablePaths = [];
+        foreach ($ruleSet as $path => $rules) {
+            if (in_array($path, $skippablePaths)) {
                 continue;
             }
+            $resolvedRules = $this->resolveRuleSet($this->parseRuleSetArray($rules));
+            $values        = $this->getValuesForPath($path);
 
-            $resolvedRules = $this->resolveRuleSet($this->parseRuleSetArray($ruleSet));
+            foreach ($values as $value) {
+                // valueNeedsValidation returns false if the value doesn't exist
+                // and it is not required, meaning, the values for related child
+                // paths do not exist either
+                if (!$this->valueNeedsValidation($value, $resolvedRules)) {
+                    $skippablePaths = array_merge($skippablePaths, $this->getChildPaths($path, array_keys($ruleSet)));
+                    continue;
+                }
 
-            foreach ($this->expandKey($key, $this->contextHandler->toArray()) as $expandedKey) {
-                if ($this->valueRequiresValidation($this->contextHandler->get($expandedKey), $resolvedRules)) {
-                    $this->validateRules($expandedKey, $resolvedRules);
+                foreach ($resolvedRules as $rule) {
+                    /** @var AbstractRule $rule */
+                    $passes = $rule->passes($value);
 
-                    if ($this->containsErrors()) {
-                        throw new ValidationFailed($this->errorBag);
+                    // If the value is null and it passed the current rule
+                    // it should not run validation for other rules.
+                    // This is in order to allow rules such as `required_with`
+                    // to work as expected
+                    if ($passes && $value === null) {
+                        break;
                     }
-                } else {
-                    $skipKeys = $this->getRelatedKeys($rules, $expandedKey);
+
+                    if (!$passes) {
+                        throw new ValidationFailed($this->getRuleFailMessage($path, $rule));
+                    }
                 }
             }
         }
     }
 
     /**
-     * @param array $rules
-     * @param string $expandedKey
+     * @param string $path
+     * @param array $paths
      * @return array
      */
-    protected function getRelatedKeys($rules, $expandedKey)
+    protected function getChildPaths($path, $paths)
     {
-        $keys = [];
-
-        foreach ($rules as $key => $ruleSet) {
-            if (substr($key, 0, strlen($expandedKey)) === $expandedKey) {
-                $keys[] = $key;
-            }
-        }
-
-        return $keys;
-    }
-
-    /**
-     * @param string $expandedKey
-     * @param array $rules
-     */
-    protected function validateRules($expandedKey, $rules)
-    {
-        foreach ($rules as $rule) {
-            /**
-             * @var AbstractRule $rule
-             */
-            if (!$rule->passesByKey($expandedKey)) {
-                $this->addError($expandedKey, $rule);
-            } else {
-                // If the required_without rule passes when the value is null,
-                // all the following rules should be skipped
-                if ($rule instanceof RequiredWithoutRule && $this->contextHandler->get($expandedKey) == null) {
-                    break;
-                }
-            }
-        }
+        return array_filter($paths, function ($rulePath) use ($path) {
+            return substr($rulePath, 0, strlen($path)) === $path;
+        });
     }
 
     /**
@@ -169,19 +153,52 @@ class Validator
      * @param array $resolvedRules
      * @return bool
      */
-    protected function valueRequiresValidation($value, $resolvedRules)
+    protected function valueNeedsValidation($value, $resolvedRules)
     {
+        // Always run rule validation on values that exist in params
         if ($value !== null) {
             return true;
         }
 
         foreach ($resolvedRules as $rule) {
-            if ($rule instanceof RequiredRule || $rule instanceof RequiredWithoutRule) {
+            /**
+             * Run rule validation if any one of the rules
+             * belongs to `required` rule type
+             *
+             * @var AbstractRule $rule
+             */
+            if (strpos($rule->getSignature(), 'required') !== false) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * @param string $path
+     * @param AbstractRule $rule
+     * @return string
+     */
+    protected function getRuleFailMessage($path, $rule)
+    {
+        return "{$path} failed [{$rule->getSignature()}] rule validation";
+    }
+
+    /**
+     * Return the values for specified parameter path.
+     * This will always return an array with a single value
+     * unless the path contains a wildcard part, in this case
+     * the values of all the matching paths will be returned
+     *
+     * @param string $path
+     * @return array
+     */
+    protected function getValuesForPath($path)
+    {
+        return array_map(function ($fullPath) {
+            return $this->contextHandler->get($fullPath);
+        }, $this->expandPath($path, $this->contextHandler->toArray()));
     }
 
     /**
@@ -191,14 +208,6 @@ class Validator
     protected function addError($key, $rule)
     {
         $this->errorBag[$key][] = $rule->getSignature();
-    }
-
-    /**
-     * @return bool
-     */
-    protected function containsErrors()
-    {
-        return !empty($this->errorBag);
     }
 
     /**
@@ -311,9 +320,9 @@ class Validator
      * @param array $context
      * @return array
      */
-    protected function expandKey($key, $context)
+    protected function expandPath($key, $context)
     {
-        return $this->findKeys($context, explode(self::PATH_DELIMITER, $key));
+        return $this->findPaths($context, explode(self::PATH_DELIMITER, $key));
     }
 
     /**
@@ -322,7 +331,7 @@ class Validator
      * @param string|null $currentPath
      * @return array
      */
-    protected function findKeys($data, $parts, $currentPath = null)
+    protected function findPaths($data, $parts, $currentPath = null)
     {
         if (count($parts) < 1) {
             return [$currentPath];
@@ -340,8 +349,8 @@ class Validator
 
         foreach ($paths as $path) {
             $resolvedPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
-            if (array_key_exists($path, $data)) {
-                $keys = array_merge($this->findKeys($data[$path], $parts, $resolvedPath), $keys);
+            if (is_array($data) && array_key_exists($path, $data)) {
+                $keys = array_merge($this->findPaths($data[$path], $parts, $resolvedPath), $keys);
             } else {
                 $keys[] = $resolvedPath;
             }

@@ -3,25 +3,10 @@
 
 namespace Luur\Validator\Exceptions;
 
-use Exception;
-
-class ValidationFailed extends Exception
+class ValidationFailed extends ValidatorException
 {
-    public function __construct($errorBag = [])
+    public function __construct($message = 'Validation failed', $code = 432, $previous = null)
     {
-        parent::__construct('Validation failed: ' . $this->formatErrorBag($errorBag));
-    }
-
-    /**
-     * @param array $errorBag
-     * @return string
-     */
-    protected function formatErrorBag($errorBag)
-    {
-        return implode(',', array_map(function ($v, $k) {
-                return $k . '->' . implode('|', $v);
-                }, $errorBag, array_keys($errorBag)
-            )
-        );
+        parent::__construct($message, $code, $previous);
     }
 }
