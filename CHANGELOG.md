@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0] - 2020-05-08
+### Added
+- Custom validation messages
+### Updated
+- Validator rule validation flow
+### Removed
+- Validator error bag (validation fail will throw exception immediately)
+
+## [1.1.6] - 2020-05-06
+### Fixed
+- RequiredWithout continuing validation on null
+
+## [1.1.5] - 2020-05-06
+### Added
+- Numeric rule
+
 ## [1.1.4] - 2019-11-29
 ### Added
 - RequiredWithout rule

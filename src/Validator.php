@@ -33,11 +33,6 @@ class Validator
     protected $contextHandler;
 
     /**
-     * @var array
-     */
-    protected $errorBag = [];
-
-    /**
      * Validator constructor.
      * @param ContextInterface|null $context
      */
@@ -54,8 +49,6 @@ class Validator
      */
     public function validate($rules, $params)
     {
-        $this->emptyErrorBag();
-
         $this->setRules($rules);
         $this->setParams($params);
 
@@ -70,11 +63,6 @@ class Validator
     public function setContextHandler(ContextInterface $handler)
     {
         $this->contextHandler = $handler;
-    }
-
-    protected function emptyErrorBag()
-    {
-        $this->errorBag = [];
     }
 
     /**
@@ -202,15 +190,6 @@ class Validator
     }
 
     /**
-     * @param string $key
-     * @param AbstractRule $rule
-     */
-    protected function addError($key, $rule)
-    {
-        $this->errorBag[$key][] = $rule->getSignature();
-    }
-
-    /**
      * @param array $rules
      * @return array
      */
@@ -305,14 +284,6 @@ class Validator
     public function getRules()
     {
         return $this->rules;
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errorBag;
     }
 
     /**
