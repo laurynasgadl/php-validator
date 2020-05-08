@@ -170,7 +170,7 @@ class Validator
         if (is_array($this->messages) && array_key_exists($messageKey, $this->messages)) {
             return $this->messages[$messageKey];
         } else {
-            return "{$path} failed [{$rule->getSignature()}] rule validation";
+            return "<{$path}> failed [{$rule->getSignature()}] rule validation";
         }
     }
 
