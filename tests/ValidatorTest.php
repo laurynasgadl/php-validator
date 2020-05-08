@@ -190,7 +190,7 @@ class ValidatorTest extends TestCase
 
     public function testSetsMockContextHandler()
     {
-        $validator = new ValidatorMock(new ContextMock());
+        $validator = new ValidatorMock(null, new ContextMock());
         $this->assertTrue($validator->getContextHandler() instanceof ContextMock);
     }
 
@@ -290,37 +290,88 @@ class ValidatorTest extends TestCase
         $validator->validate($rules, $params);
     }
 
-    public function testReturnsCustomValidationMessages()
+    public function testValidatesRequiredWithRule()
     {
-        $rules = [
-            'username'      => 'required|string|min:5',
-            'password'      => 'required|string|min:8',
-            'profile'       => 'array',
-            'profile.*'     => 'string|min:8',
-            'options'       => 'array',
-            'options.*.key' => 'required|string',
+        $rules  = [
+            'arg_1' => 'required_with:arg_2,arg_3|string',
+        ];
+        $params = [
+            'arg_2' => null,
+            'arg_3' => 'test',
         ];
 
+        $validator = new Validator();
+        $result    = $validator->validate($rules, $params);
+        $this->assertEquals($params, $result);
+    }
+
+    public function testThrowsRequiredWithRuleException()
+    {
+        $this->expectException(ValidationFailed::class);
+        $this->expectExceptionMessage('arg_1 failed [required_with:arg_2,arg_3] rule validation');
+
+        $rules  = [
+            'arg_1' => 'required_with:arg_2,arg_3',
+        ];
         $params = [
-            'username' => 'BoatyMcBoatface',
-            'password' => '12345678',
-            'profile'  => [
-                'email' => 'best_boat_in_the_west@atlantic.com',
-            ],
-            'options'  => [
+            'arg_2' => 2,
+            'arg_3' => 3,
+        ];
+
+        $validator = new Validator();
+        $validator->validate($rules, $params);
+    }
+
+    public function testReturnsCustomValidationMessageSetFromConstructor()
+    {
+        $message  = 'Option key should be a string';
+        $rules    = ['options.*.key' => 'required|string'];
+        $messages = ['options.*.key.string' => $message];
+
+        $params = [
+            'options' => [
                 [
-                    'key'   => 'opt_in',
+                    'key' => 'passes',
                     'value' => true,
                 ],
                 [
-                    'key'   => 'dark_mode',
+                    'key' => ['passes'],
                     'value' => false,
                 ],
             ],
         ];
 
-        $validator = new Validator();
+        self::expectException(ValidationFailed::class);
+        self::expectExceptionMessage($message);
+
+        $validator = new Validator($messages);
         $validator->validate($rules, $params);
+    }
+
+    public function testReturnsCustomValidationMessageSetFromMethod()
+    {
+        $message  = 'Option key should be a string';
+        $rules    = ['options.*.key' => 'required|string'];
+        $messages = ['options.*.key.string' => $message];
+
+        $params = [
+            'options' => [
+                [
+                    'key' => 'passes',
+                    'value' => true,
+                ],
+                [
+                    'key' => ['passes'],
+                    'value' => false,
+                ],
+            ],
+        ];
+
+        self::expectException(ValidationFailed::class);
+        self::expectExceptionMessage($message);
+
+        $validator = new Validator();
+        $validator->validate($rules, $params, $messages);
     }
 
     public function createValidator()

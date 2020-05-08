@@ -25,7 +25,7 @@ class Validator
     /**
      * @var array
      */
-    protected $rules;
+    protected $messages;
 
     /**
      * @var ContextInterface
@@ -34,51 +34,46 @@ class Validator
 
     /**
      * Validator constructor.
+     * @param array|null $messages
      * @param ContextInterface|null $context
      */
-    public function __construct($context = null)
+    public function __construct($messages = null, $context = null)
     {
+        $this->messages       = $messages;
         $this->contextHandler = $context ? : new Context();
     }
 
     /**
      * @param array $rules
      * @param array $params
+     * @param array|null $messages
      * @return array
      * @throws ValidatorException
      */
-    public function validate($rules, $params)
+    public function validate($rules, $params, $messages = null)
     {
-        $this->setRules($rules);
-        $this->setParams($params);
-
+        $this->setMessages($messages);
+        $this->contextHandler->setParams($params);
         $this->execValidation($this->sortRules($rules));
+        return $this->contextHandler->toArray();
+    }
 
-        return $this->getParams();
+    /**
+     * @param array|null $messages
+     */
+    public function setMessages($messages)
+    {
+        if (is_array($messages)) {
+            $this->messages = $messages;
+        }
     }
 
     /**
      * @param ContextInterface $handler
      */
-    public function setContextHandler(ContextInterface $handler)
+    public function setContextHandler($handler)
     {
         $this->contextHandler = $handler;
-    }
-
-    /**
-     * @param array $rules
-     */
-    protected function setRules($rules)
-    {
-        $this->rules = $rules;
-    }
-
-    /**
-     * @param array $params
-     */
-    protected function setParams($params)
-    {
-        $this->contextHandler->setParams($params);
     }
 
     /**
@@ -170,7 +165,13 @@ class Validator
      */
     protected function getRuleFailMessage($path, $rule)
     {
-        return "{$path} failed [{$rule->getSignature()}] rule validation";
+        $messageKey = $path . '.' . $rule->getSignature();
+
+        if (is_array($this->messages) && array_key_exists($messageKey, $this->messages)) {
+            return $this->messages[$messageKey];
+        } else {
+            return "{$path} failed [{$rule->getSignature()}] rule validation";
+        }
     }
 
     /**
@@ -202,6 +203,7 @@ class Validator
         uksort($rules, function ($a, $b) use ($parser) {
             $aCount = $parser($a);
             $bCount = $parser($b);
+
             return $aCount > $bCount;
         });
 
@@ -271,22 +273,6 @@ class Validator
     }
 
     /**
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->contextHandler->toArray();
-    }
-
-    /**
-     * @return array
-     */
-    public function getRules()
-    {
-        return $this->rules;
-    }
-
-    /**
      * @param string $key
      * @param array $context
      * @return array
@@ -319,7 +305,7 @@ class Validator
         $keys = [];
 
         foreach ($paths as $path) {
-            $resolvedPath = $currentPath ? $currentPath . self::PATH_DELIMITER . $path : $path;
+            $resolvedPath = $currentPath ? $currentPath.self::PATH_DELIMITER.$path : $path;
             if (is_array($data) && array_key_exists($path, $data)) {
                 $keys = array_merge($this->findPaths($data[$path], $parts, $resolvedPath), $keys);
             } else {
