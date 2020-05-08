@@ -63,6 +63,32 @@ $result = $validator->validate([
 ], $params);
 ```
 
+You can also register the rule to be able to use it as a string:
+
+```php
+use Luur\Validator\Rules\AbstractRule;
+use Luur\Validator\Validator;
+
+class CustomRule extends AbstractRule {
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function passes($value)
+    {
+        return true;
+    }
+}
+
+$validator = new Validator();
+$validator->registerRule(CustomRule::getSlug(), CustomRule::class);
+
+$params = ['test' => 123];
+$result = $validator->validate([
+    'test' => 'test',
+], $params);
+```
+
 #### Existing rules
 `array` : the value needs to be an array
 

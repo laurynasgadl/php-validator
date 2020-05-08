@@ -9,6 +9,7 @@ use Luur\Validator\Exceptions\ValidationFailed;
 use Luur\Validator\Rules\AbstractRule;
 use Luur\Validator\Rules\Concrete\IntegerRule;
 use Luur\Validator\Rules\Concrete\RequiredRule;
+use Luur\Validator\Tests\Rules\TestRule;
 use Luur\Validator\Validator;
 use PHPUnit\Framework\TestCase;
 
@@ -39,7 +40,6 @@ class ValidatorTest extends TestCase
         $params = ['test' => 'test'];
         $rules  = ['test' => 'integer|required'];
 
-        $validator->setRules($rules);
         $validator->setParams($params);
 
         $ruleArray = $validator->mockParseRuleSetArray(array_shift($rules));
@@ -75,7 +75,7 @@ class ValidatorTest extends TestCase
     public function testReturnsFailingValidation()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('test failed [integer] rule validation');
+        $this->expectExceptionMessage('<test> failed [integer] rule validation');
 
         $validator = $this->createValidator();
         $validator->validate([
@@ -130,9 +130,9 @@ class ValidatorTest extends TestCase
     {
         $validator = $this->createValidator();
 
-        $params = ['test' => 123];
+        $params = ['test' => 'test'];
         $result = $validator->validate([
-            'test' => new MockRule(),
+            'test' => new TestRule(),
         ], $params);
         $this->assertEquals($result, $params);
     }
@@ -219,7 +219,7 @@ class ValidatorTest extends TestCase
     public function testValidatesNestedEmptyValues()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('arg_2.*.arg_1 failed [required] rule validation');
+        $this->expectExceptionMessage('<arg_2.*.arg_1> failed [required] rule validation');
 
         $rules = [
             'arg_2.*.arg_1' => 'required|string',
@@ -277,7 +277,7 @@ class ValidatorTest extends TestCase
     public function testThrowsRequiredWithoutRuleException()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('arg_1 failed [required_without:arg_2,arg_3] rule validation');
+        $this->expectExceptionMessage('<arg_1> failed [required_without:arg_2,arg_3] rule validation');
 
         $rules  = [
             'arg_1' => 'required_without:arg_2,arg_3',
@@ -308,7 +308,7 @@ class ValidatorTest extends TestCase
     public function testThrowsRequiredWithRuleException()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('arg_1 failed [required_with:arg_2,arg_3] rule validation');
+        $this->expectExceptionMessage('<arg_1> failed [required_with:arg_2,arg_3] rule validation');
 
         $rules  = [
             'arg_1' => 'required_with:arg_2,arg_3',
@@ -374,6 +374,16 @@ class ValidatorTest extends TestCase
         $validator->validate($rules, $params, $messages);
     }
 
+    public function testRegistersCustomRule()
+    {
+        self::expectException(ValidationFailed::class);
+        self::expectExceptionMessage('<username> failed [test] rule validation');
+
+        $validator = new Validator();
+        $validator->registerRule(TestRule::getSlug(), TestRule::class);
+        $validator->validate(['username' => ['test']], ['username' => 123]);
+    }
+
     public function createValidator()
     {
         return new Validator();
@@ -423,33 +433,11 @@ class ContextMock implements ContextInterface
     }
 }
 
-class MockRule extends AbstractRule
-{
-    /**
-     * @param mixed $value
-     * @return bool
-     */
-    public function passes($value)
-    {
-        return true;
-    }
-}
-
 class ValidatorMock extends Validator
 {
     public function mockSortRules($rules)
     {
         return $this->sortRules($rules);
-    }
-
-    public function getRules()
-    {
-        return $this->rules;
-    }
-
-    public function setRules($rules)
-    {
-        return $this->rules = $rules;
     }
 
     public function setParams($params)

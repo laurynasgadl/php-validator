@@ -5,10 +5,11 @@ namespace Luur\Validator;
 
 
 use Luur\Validator\Exceptions\InvalidRule;
+use Luur\Validator\Exceptions\RuleRegistryException;
 use Luur\Validator\Exceptions\ValidationFailed;
 use Luur\Validator\Exceptions\ValidatorException;
 use Luur\Validator\Rules\AbstractRule;
-use Luur\Validator\Rules\RuleFactory;
+use Luur\Validator\Rules\RuleRegistry;
 
 class Validator
 {
@@ -28,6 +29,11 @@ class Validator
     protected $messages;
 
     /**
+     * @var RuleRegistry
+     */
+    protected $registry;
+
+    /**
      * @var ContextInterface
      */
     protected $contextHandler;
@@ -39,8 +45,9 @@ class Validator
      */
     public function __construct($messages = null, $context = null)
     {
-        $this->messages       = $messages;
-        $this->contextHandler = $context ? : new Context();
+        $this->messages        = $messages;
+        $this->contextHandler  = $context ? : new Context();
+        $this->registry        = $this->buildRegistry();
     }
 
     /**
@@ -55,6 +62,7 @@ class Validator
         $this->setMessages($messages);
         $this->contextHandler->setParams($params);
         $this->execValidation($this->sortRules($rules));
+
         return $this->contextHandler->toArray();
     }
 
@@ -77,6 +85,16 @@ class Validator
     }
 
     /**
+     * @param string $ruleSlug
+     * @param string $ruleClass
+     * @throws RuleRegistryException
+     */
+    public function registerRule($ruleSlug, $ruleClass)
+    {
+        $this->registry->register($ruleSlug, $ruleClass);
+    }
+
+    /**
      * @param array $ruleSet
      * @throws ValidatorException
      */
@@ -91,9 +109,11 @@ class Validator
             $values        = $this->getValuesForPath($path);
 
             foreach ($values as $value) {
-                // valueNeedsValidation returns false if the value doesn't exist
-                // and it is not required, meaning, the values for related child
-                // paths do not exist either
+                /**
+                 * valueNeedsValidation returns false if the value doesn't exist
+                 * and it is not required, meaning, the values for related child
+                 * paths do not exist either
+                 */
                 if (!$this->valueNeedsValidation($value, $resolvedRules)) {
                     $skippablePaths = array_merge($skippablePaths, $this->getChildPaths($path, array_keys($ruleSet)));
                     continue;
@@ -103,10 +123,12 @@ class Validator
                     /** @var AbstractRule $rule */
                     $passes = $rule->passes($value);
 
-                    // If the value is null and it passed the current rule
-                    // it should not run validation for other rules.
-                    // This is in order to allow rules such as `required_with`
-                    // to work as expected
+                    /**
+                     * If the value is null and it passed the current rule
+                     * it should not run validation for other rules.
+                     * This is in order to allow rules such as `required_with`
+                     * to work as expected
+                     */
                     if ($passes && $value === null) {
                         break;
                     }
@@ -138,7 +160,9 @@ class Validator
      */
     protected function valueNeedsValidation($value, $resolvedRules)
     {
-        // Always run rule validation on values that exist in params
+        /**
+         * Always run rule validation on values that exist in params
+         */
         if ($value !== null) {
             return true;
         }
@@ -165,7 +189,7 @@ class Validator
      */
     protected function getRuleFailMessage($path, $rule)
     {
-        $messageKey = $path . '.' . $rule->getSignature();
+        $messageKey = $path.'.'.$rule->getSignature();
 
         if (is_array($this->messages) && array_key_exists($messageKey, $this->messages)) {
             return $this->messages[$messageKey];
@@ -245,11 +269,12 @@ class Validator
                     $ruleArgs = explode(self::RULE_PARAM_DELIMITER, $ruleArgs[0]);
                 }
 
-                $ruleSet[] = RuleFactory::build($this->contextHandler, $ruleSlug, $ruleArgs);
-            } elseif ($rule instanceof AbstractRule) {
-                $rule->setContext($this->contextHandler);
-                $ruleSet[] = $rule;
+                $ruleClass = $this->registry->find($ruleSlug);
+                $rule      = new $ruleClass(...$ruleArgs);
             }
+
+            $rule->setContext($this->contextHandler);
+            $ruleSet[] = $rule;
         }
 
         return $this->sortRuleSet($ruleSet);
@@ -314,5 +339,26 @@ class Validator
         }
 
         return $keys;
+    }
+
+    /**
+     * @return RuleRegistry
+     */
+    protected function buildRegistry()
+    {
+        $rules = [];
+
+        $ruleClasses = array_map(function ($ruleFile) {
+            return __NAMESPACE__ . '\\Rules\\Concrete\\' . pathinfo($ruleFile, PATHINFO_FILENAME);
+        }, array_diff(scandir(__DIR__ . '/Rules/Concrete'), array('.', '..')));
+
+        foreach ($ruleClasses as $ruleClass) {
+            /**
+             * @var AbstractRule $ruleClass
+             */
+            $rules[$ruleClass::getSlug()] = $ruleClass;
+        }
+
+        return new RuleRegistry($rules);
     }
 }
