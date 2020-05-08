@@ -74,16 +74,13 @@ class ValidatorTest extends TestCase
 
     public function testReturnsFailingValidation()
     {
+        $this->expectException(ValidationFailed::class);
+        $this->expectExceptionMessage('test failed [integer] rule validation');
+
         $validator = $this->createValidator();
-
-        try {
-            $validator->validate([
-                'test' => 'integer|required',
-            ], ['test' => 'test']);
-        } catch (ValidationFailed $exception) {
-        }
-
-        $this->assertEquals(['test' => [IntegerRule::getSlug()]], $validator->getErrors());
+        $validator->validate([
+            'test' => 'integer|required',
+        ], ['test' => 'test']);
     }
 
     public function testValidatesArrayParams()
@@ -95,7 +92,7 @@ class ValidatorTest extends TestCase
                 'test'  => -10,
                 'test1' => 'test',
                 'test2' => 1.1,
-            ]
+            ],
         ];
 
         $result = $validator->validate([
@@ -117,7 +114,7 @@ class ValidatorTest extends TestCase
             'test' => [
                 'test'  => 123,
                 'test1' => 123,
-            ]
+            ],
         ];
 
         $result = $validator->validate([
@@ -193,7 +190,7 @@ class ValidatorTest extends TestCase
 
     public function testSetsMockContextHandler()
     {
-        $validator = new ValidatorMock(new ContextMock());
+        $validator = new ValidatorMock(null, new ContextMock());
         $this->assertTrue($validator->getContextHandler() instanceof ContextMock);
     }
 
@@ -222,7 +219,7 @@ class ValidatorTest extends TestCase
     public function testValidatesNestedEmptyValues()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('Validation failed: arg_2.0.arg_1->required|string');
+        $this->expectExceptionMessage('arg_2.*.arg_1 failed [required] rule validation');
 
         $rules = [
             'arg_2.*.arg_1' => 'required|string',
@@ -280,7 +277,7 @@ class ValidatorTest extends TestCase
     public function testThrowsRequiredWithoutRuleException()
     {
         $this->expectException(ValidationFailed::class);
-        $this->expectExceptionMessage('Validation failed: arg_1->required_without:arg_2,arg_3');
+        $this->expectExceptionMessage('arg_1 failed [required_without:arg_2,arg_3] rule validation');
 
         $rules  = [
             'arg_1' => 'required_without:arg_2,arg_3',
@@ -291,6 +288,90 @@ class ValidatorTest extends TestCase
 
         $validator = new Validator();
         $validator->validate($rules, $params);
+    }
+
+    public function testValidatesRequiredWithRule()
+    {
+        $rules  = [
+            'arg_1' => 'required_with:arg_2,arg_3|string',
+        ];
+        $params = [
+            'arg_2' => null,
+            'arg_3' => 'test',
+        ];
+
+        $validator = new Validator();
+        $result    = $validator->validate($rules, $params);
+        $this->assertEquals($params, $result);
+    }
+
+    public function testThrowsRequiredWithRuleException()
+    {
+        $this->expectException(ValidationFailed::class);
+        $this->expectExceptionMessage('arg_1 failed [required_with:arg_2,arg_3] rule validation');
+
+        $rules  = [
+            'arg_1' => 'required_with:arg_2,arg_3',
+        ];
+        $params = [
+            'arg_2' => 2,
+            'arg_3' => 3,
+        ];
+
+        $validator = new Validator();
+        $validator->validate($rules, $params);
+    }
+
+    public function testReturnsCustomValidationMessageSetFromConstructor()
+    {
+        $message  = 'Option key should be a string';
+        $rules    = ['options.*.key' => 'required|string'];
+        $messages = ['options.*.key.string' => $message];
+
+        $params = [
+            'options' => [
+                [
+                    'key' => 'passes',
+                    'value' => true,
+                ],
+                [
+                    'key' => ['passes'],
+                    'value' => false,
+                ],
+            ],
+        ];
+
+        self::expectException(ValidationFailed::class);
+        self::expectExceptionMessage($message);
+
+        $validator = new Validator($messages);
+        $validator->validate($rules, $params);
+    }
+
+    public function testReturnsCustomValidationMessageSetFromMethod()
+    {
+        $message  = 'Option key should be a string';
+        $rules    = ['options.*.key' => 'required|string'];
+        $messages = ['options.*.key.string' => $message];
+
+        $params = [
+            'options' => [
+                [
+                    'key' => 'passes',
+                    'value' => true,
+                ],
+                [
+                    'key' => ['passes'],
+                    'value' => false,
+                ],
+            ],
+        ];
+
+        self::expectException(ValidationFailed::class);
+        self::expectExceptionMessage($message);
+
+        $validator = new Validator();
+        $validator->validate($rules, $params, $messages);
     }
 
     public function createValidator()

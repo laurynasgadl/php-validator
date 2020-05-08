@@ -27,8 +27,8 @@ $params = [
 
 try {
     $validator->validate($rules, $params);
-catch (ValidationFailed $exception) {
-    var_dump($validator->getErrors());
+} catch (ValidationFailed $exception) {
+    var_dump($exception->getMessage());
 }
 ```
 
@@ -78,7 +78,9 @@ $result = $validator->validate([
 
 `required` : the parameter needs to exist in the data set
 
-`required_without:{param_1},{param_2}...` : the parameter needs to exist in the data set if one of the other parameters do not exist
+`required_with:{param_1}...` : the parameter needs to exist in the data set if all the other parameters exist
+
+`required_without:{param_1}...` : the parameter needs to exist in the data set if one of the other parameters do not exist
 
 `size` : the size of the value needs to be equal to the given amount. The size of a string is its length, the size of an array is the number of elements inside it, the size of a boolean is 0 or 1.
 
@@ -87,3 +89,34 @@ $result = $validator->validate([
 `boolean` : the value needs to be a boolean
 
 `numeric` : the value needs to be a numeric
+
+## Custom messages
+You can set custom validation messages either via the Validator constructor or the `validate` method:
+```php
+use Luur\Validator\Validator;
+
+$validator = new Validator();
+
+$rules = [
+    'options.*.key' => 'string|required',
+];
+
+$params = [
+    'options' => [
+        [
+            'key' => 'passes',
+            'value' => true,
+        ],
+        [
+            'key' => ['passes'],
+            'value' => false,
+        ],
+    ],
+];
+
+$messages = [
+    'options.*.key.string' => 'Option key should be a string',
+];
+
+$validator->validate($rules, $params, $messages);
+```

@@ -3,11 +3,9 @@
 
 namespace Luur\Validator\Exceptions;
 
-use Exception;
-
-class InvalidRule extends Exception
+class InvalidRule extends ValidatorException
 {
-    public function __construct($message = null) {
-        parent::__construct($message ?: 'Invalid rule provided.');
+    public function __construct($message = 'Invalid rule provided', $code = 431, $previous = null) {
+        parent::__construct($message, $code, $previous);
     }
 }

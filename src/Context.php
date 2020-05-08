@@ -21,7 +21,7 @@ class Context implements ContextInterface
 
     /**
      * @param string $key
-     * @return null
+     * @return mixed
      * @throws BranchNotFoundException
      */
     public function get($key)
