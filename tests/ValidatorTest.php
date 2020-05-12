@@ -331,10 +331,6 @@ class ValidatorTest extends TestCase
         $params = [
             'options' => [
                 [
-                    'key' => 'passes',
-                    'value' => true,
-                ],
-                [
                     'key' => ['passes'],
                     'value' => false,
                 ],
@@ -382,6 +378,43 @@ class ValidatorTest extends TestCase
         $validator = new Validator();
         $validator->registerRule(TestRule::getSlug(), TestRule::class);
         $validator->validate(['username' => ['test']], ['username' => 123]);
+    }
+
+    public function testSetsDefaultValueOfNonExistingParam()
+    {
+        $validator = new Validator();
+        $rules = [
+            'client.details.id' => ['default:test'],
+        ];
+        $result = $validator->validate($rules, ['username' => 123]);
+        self::assertEquals([
+            'username' => 123,
+            'client' => [
+                'details' => [
+                    'id' => 'test',
+                ],
+            ],
+        ], $result);
+    }
+
+    public function testDefaultOverridesNullValue()
+    {
+        $validator = new Validator();
+        $rules = [
+            'username' => ['default:test'],
+        ];
+        $result = $validator->validate($rules, ['username' => null]);
+        self::assertEquals(['username' => 'test'], $result);
+    }
+
+    public function testHandlesRequiredAndDefaultRuleCombo()
+    {
+        $validator = new Validator();
+        $rules = [
+            'username' => 'required|default:test|string',
+        ];
+        $result = $validator->validate($rules, []);
+        self::assertEquals(['username' => 'test'], $result);
     }
 
     public function createValidator()

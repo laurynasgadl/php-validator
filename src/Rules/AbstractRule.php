@@ -20,11 +20,19 @@ abstract class AbstractRule
     protected $precedence = 0;
 
     /**
+     * Should the validator pass the path to
+     * the value instead of the value itself
+     *
+     * @var bool
+     */
+    protected $passPath = false;
+
+    /**
      * @param ContextInterface $context
      */
     public function setContext(ContextInterface &$context)
     {
-        $this->context = $context;
+        $this->context = &$context;
     }
 
     /**
@@ -63,7 +71,7 @@ abstract class AbstractRule
 
         $params = array_filter(get_object_vars($this), function ($key) {
             return !in_array($key, [
-                'precedence', 'context',
+                'precedence', 'context', 'passPath',
             ]);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -98,5 +106,13 @@ abstract class AbstractRule
     public function passesByKey($key)
     {
         return $this->passes($this->context->get($key));
+    }
+
+    /**
+     * @return bool
+     */
+    public function expectsPath()
+    {
+        return $this->passPath;
     }
 }

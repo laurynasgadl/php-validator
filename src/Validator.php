@@ -106,9 +106,11 @@ class Validator
                 continue;
             }
             $resolvedRules = $this->resolveRuleSet($this->parseRuleSetArray($rules));
-            $values        = $this->getValuesForPath($path);
+            $resolvedPaths = $this->resolveFullPaths($path);
 
-            foreach ($values as $value) {
+            foreach ($resolvedPaths as $fullPath) {
+                $value = $this->contextHandler->get($fullPath);
+
                 /**
                  * valueNeedsValidation returns false if the value doesn't exist
                  * and it is not required, meaning, the values for related child
@@ -121,7 +123,15 @@ class Validator
 
                 foreach ($resolvedRules as $rule) {
                     /** @var AbstractRule $rule */
-                    $passes = $rule->passes($value);
+                    $passes = $this->ruleEvaluatedByPath($rule) ?
+                        $rule->passes($path) :
+                        $rule->passes($value);
+
+                    /**
+                     * After the rule is applied, get the value again
+                     * as it may have been changed by the rule.
+                     */
+                    $value = $this->contextHandler->get($fullPath);
 
                     /**
                      * If the value is null and it passed the current rule
@@ -139,6 +149,19 @@ class Validator
                 }
             }
         }
+    }
+
+    /**
+     * Check if the path should be passed to the rule
+     * instead of the value. This is mostly used for
+     * `default` rule.
+     *
+     * @param AbstractRule $rule
+     * @return bool
+     */
+    protected function ruleEvaluatedByPath(AbstractRule $rule)
+    {
+        return $rule->expectsPath();
     }
 
     /**
@@ -170,11 +193,12 @@ class Validator
         foreach ($resolvedRules as $rule) {
             /**
              * Run rule validation if any one of the rules
-             * belongs to `required` rule type
+             * belongs to `required` or `default` rule type
              *
              * @var AbstractRule $rule
              */
-            if (strpos($rule->getSignature(), 'required') !== false) {
+            if (strpos($rule->getSignature(), 'required') !== false ||
+                strpos($rule->getSignature(), 'default') !== false) {
                 return true;
             }
         }
@@ -199,19 +223,17 @@ class Validator
     }
 
     /**
-     * Return the values for specified parameter path.
-     * This will always return an array with a single value
+     * Return the full paths for specified parameter path.
+     * This will always return an array with a single full path
      * unless the path contains a wildcard part, in this case
-     * the values of all the matching paths will be returned
+     * all paths matching the wildcard pattern will be returned
      *
      * @param string $path
      * @return array
      */
-    protected function getValuesForPath($path)
+    protected function resolveFullPaths($path)
     {
-        return array_map(function ($fullPath) {
-            return $this->contextHandler->get($fullPath);
-        }, $this->expandPath($path, $this->contextHandler->toArray()));
+        return $this->expandPath($path, $this->contextHandler->toArray());
     }
 
     /**

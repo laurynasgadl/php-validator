@@ -116,6 +116,8 @@ $result = $validator->validate([
 
 `numeric` : the value needs to be a numeric
 
+`default:{value}` : the rule will always be applied first, meaning, params can successfully pass `required` rules even if their value is not set or is null
+
 ## Custom messages
 You can set custom validation messages either via the Validator constructor or the `validate` method:
 ```php

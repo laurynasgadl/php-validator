@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.0] - 2020-05-12
+### Added
+- Default rule
+
 ## [2.1.0] - 2020-05-08
 ### Added
 - Ability to register custom rules so that they can be resolved via string
