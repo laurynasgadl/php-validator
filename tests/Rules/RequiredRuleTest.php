@@ -50,6 +50,11 @@ class RequiredRuleTest extends TestCase
         $this->assertFalse((new RequiredRule())->passes(null));
     }
 
+    public function testFailsOnEmptyString()
+    {
+        $this->assertFalse((new RequiredRule())->passes(''));
+    }
+
     public function testGetsSlug()
     {
         $this->assertEquals('required', RequiredRule::getSlug());

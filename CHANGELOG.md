@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.1] - 2020-05-12
+### Updated
+- Required rule now fails on empty string
+
 ## [2.2.0] - 2020-05-12
 ### Added
 - Default rule

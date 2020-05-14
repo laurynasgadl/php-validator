@@ -16,6 +16,6 @@ class RequiredRule extends AbstractRule
      */
     public function passes($value)
     {
-        return !is_null($value);
+        return !is_null($value) && $value !== '';
     }
 }
