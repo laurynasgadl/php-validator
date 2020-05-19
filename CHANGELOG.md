@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.2] - 2020-05-19
+### Added
+- AlphaDash rule
+- AlphaNumeric rule
+- Regex rule
+
 ## [2.2.1] - 2020-05-12
 ### Updated
 - Required rule now fails on empty string

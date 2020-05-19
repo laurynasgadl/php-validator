@@ -118,6 +118,12 @@ $result = $validator->validate([
 
 `default:{value}` : the rule will always be applied first, meaning, params can successfully pass `required` rules even if their value is not set or is null
 
+`alpha_dash` : the value can only be made up of uppercase and lowercase letters, numbers and `-` or `_` symbols
+
+`alpha_numeric` : the value can only be made up of uppercase and lowercase letters and numbers
+
+`regex:{pattern}` : the value needs to match the given pattern
+
 ## Custom messages
 You can set custom validation messages either via the Validator constructor or the `validate` method:
 ```php
