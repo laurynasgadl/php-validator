@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.3] - 2020-05-20
+### Added
+- Email rule
+- URL rule
+- IP rule
+
 ## [2.2.2] - 2020-05-19
 ### Added
 - AlphaDash rule

@@ -124,6 +124,12 @@ $result = $validator->validate([
 
 `regex:{pattern}` : the value needs to match the given pattern
 
+`email` : the value needs to be an email
+
+`url` : the value needs to start with `http://` or `https://` and only contain URL-valid symbols
+
+`ip` : the value needs to be an IP address
+
 ## Custom messages
 You can set custom validation messages either via the Validator constructor or the `validate` method:
 ```php
