@@ -331,7 +331,7 @@ class ValidatorTest extends TestCase
         $params = [
             'options' => [
                 [
-                    'key' => ['passes'],
+                    'key'   => ['passes'],
                     'value' => false,
                 ],
             ],
@@ -353,11 +353,11 @@ class ValidatorTest extends TestCase
         $params = [
             'options' => [
                 [
-                    'key' => 'passes',
+                    'key'   => 'passes',
                     'value' => true,
                 ],
                 [
-                    'key' => ['passes'],
+                    'key'   => ['passes'],
                     'value' => false,
                 ],
             ],
@@ -383,13 +383,13 @@ class ValidatorTest extends TestCase
     public function testSetsDefaultValueOfNonExistingParam()
     {
         $validator = new Validator();
-        $rules = [
+        $rules     = [
             'client.details.id' => ['default:test'],
         ];
-        $result = $validator->validate($rules, ['username' => 123]);
+        $result    = $validator->validate($rules, ['username' => 123]);
         self::assertEquals([
             'username' => 123,
-            'client' => [
+            'client'   => [
                 'details' => [
                     'id' => 'test',
                 ],
@@ -400,21 +400,66 @@ class ValidatorTest extends TestCase
     public function testDefaultOverridesNullValue()
     {
         $validator = new Validator();
-        $rules = [
+        $rules     = [
             'username' => ['default:test'],
         ];
-        $result = $validator->validate($rules, ['username' => null]);
+        $result    = $validator->validate($rules, ['username' => null]);
         self::assertEquals(['username' => 'test'], $result);
     }
 
     public function testHandlesRequiredAndDefaultRuleCombo()
     {
         $validator = new Validator();
-        $rules = [
+        $rules     = [
             'username' => 'required|default:test|string',
         ];
-        $result = $validator->validate($rules, []);
+        $result    = $validator->validate($rules, []);
         self::assertEquals(['username' => 'test'], $result);
+    }
+
+    public function testGetsValidatedParams()
+    {
+        $rules  = [
+            'arg_1'               => 'required_with:arg_2,arg_3|array',
+            'arg_2'               => 'default:test|string',
+            'arg_3'               => 'required|string',
+            'arg_4.include.*'     => 'array',
+            'arg_4.include.*.key' => 'required|integer',
+        ];
+        $params = [
+            'arg_2' => null,
+            'arg_3' => 'test2',
+            'arg_4' => [
+                'ignore'  => true,
+                'include' => [
+                    [
+                        'key' => 1,
+                    ],
+                    [
+                        'key' => 2,
+                    ],
+                ],
+            ],
+            'arg_5' => 123,
+        ];
+
+        $validator = new Validator();
+        $validator->validate($rules, $params);
+        $validated = $validator->validated();
+        $this->assertEquals([
+            'arg_2' => 'test',
+            'arg_3' => 'test2',
+            'arg_4' => [
+                'include' => [
+                    [
+                        'key' => 1,
+                    ],
+                    [
+                        'key' => 2,
+                    ],
+                ],
+            ],
+        ], $validated);
     }
 
     public function createValidator()

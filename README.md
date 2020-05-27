@@ -26,7 +26,8 @@ $params = [
 ];
 
 try {
-    $validator->validate($rules, $params);
+    $allParams       = $validator->validate($rules, $params);
+    $validatedParams = $validator->validated();
 } catch (ValidationFailed $exception) {
     var_dump($exception->getMessage());
 }

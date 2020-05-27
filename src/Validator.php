@@ -39,15 +39,23 @@ class Validator
     protected $contextHandler;
 
     /**
+     * @var ContextInterface
+     */
+    protected $validated;
+
+    /**
      * Validator constructor.
      * @param array|null $messages
      * @param ContextInterface|null $context
      */
     public function __construct($messages = null, $context = null)
     {
-        $this->messages        = $messages;
         $this->contextHandler  = $context ? : new Context();
+        $this->messages        = $messages;
         $this->registry        = $this->buildRegistry();
+
+        $contextClass          = get_class($this->contextHandler);
+        $this->validated       = new $contextClass();
     }
 
     /**
@@ -59,6 +67,7 @@ class Validator
      */
     public function validate($rules, $params, $messages = null)
     {
+        $this->validated->setParams([]);
         $this->setMessages($messages);
         $this->contextHandler->setParams($params);
         $this->execValidation($this->sortRules($rules));
@@ -92,6 +101,16 @@ class Validator
     public function registerRule($ruleSlug, $ruleClass)
     {
         $this->registry->register($ruleSlug, $ruleClass);
+    }
+
+    /**
+     * Get only the validated params of the last validation
+     *
+     * @return array
+     */
+    public function validated()
+    {
+        return $this->validated->toArray();
     }
 
     /**
@@ -146,6 +165,8 @@ class Validator
                     if (!$passes) {
                         throw new ValidationFailed($this->getRuleFailMessage($path, $rule));
                     }
+
+                    $this->validated->set($fullPath, $value);
                 }
             }
         }

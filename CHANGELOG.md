@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.4] - 2020-05-27
+### Added
+- `validated` method for getting only the validated params of the last validation
+
 ## [2.2.3] - 2020-05-20
 ### Added
 - Email rule
