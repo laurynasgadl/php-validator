@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.5] - 2020-05-28
+### Updated
+- Required rule now does not fail on empty string
+
 ## [2.2.4] - 2020-05-27
 ### Added
 - `validated` method for getting only the validated params of the last validation
