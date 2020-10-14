@@ -25,13 +25,13 @@ class StringRuleTest extends TestCase
                 [], false
             ],
             [
-                1.1, false
+                1.1, true
             ],
             [
-                123, false
+                123, true
             ],
             [
-                0, false
+                0, true
             ],
         ];
     }

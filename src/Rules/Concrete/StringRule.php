@@ -14,6 +14,6 @@ class StringRule extends AbstractRule
      */
     public function passes($value)
     {
-        return is_string($value);
+        return is_string($value) || is_numeric($value);
     }
 }

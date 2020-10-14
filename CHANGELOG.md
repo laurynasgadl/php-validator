@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.6] - 2020-05-28
+### Updated
+- String rule now does not fail on numerical input
+
 ## [2.2.5] - 2020-05-28
 ### Updated
 - Required rule now does not fail on empty string
