@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.2.6] - 2020-05-28
+## [2.2.6] - 2020-10-14
 ### Updated
 - String rule now does not fail on numerical input
 
