@@ -1,6 +1,6 @@
 <?php
 
-namespace Luur\Validator\Tools\Tests;
+namespace Luur\Validator\Tests\Tools;
 
 use Luur\Validator\Tools\Helpers;
 use PHPUnit\Framework\TestCase;
