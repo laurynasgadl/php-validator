@@ -12,7 +12,7 @@ class DefaultRuleTest extends TestCase
 {
     protected $context;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->context = new Context([
