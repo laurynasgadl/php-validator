@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.7] - 2021-03-19
+### Updated
+- Fixed Helper test namespace not matching PSR-0/PSR-4
+- Fixed `setUp` visibility override in DefaultRuleTest
+
 ## [2.2.6] - 2020-10-14
 ### Updated
 - String rule now does not fail on numerical input
