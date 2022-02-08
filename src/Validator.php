@@ -271,7 +271,7 @@ class Validator
             $aCount = $parser($a);
             $bCount = $parser($b);
 
-            return $aCount > $bCount ? 1 : -1;
+            return $aCount <=> $bCount;
         });
 
         return $rules;
@@ -288,7 +288,7 @@ class Validator
              * @var AbstractRule $a
              * @var AbstractRule $b
              */
-            return $a->getPrecedence() < $b->getPrecedence() ? 1 : -1;
+            return $b->getPrecedence() <=> $a->getPrecedence();
         });
 
         return $rulesSet;
