@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.0] - 2022-02-08
+### Updated
+- Changed PHP sort functions to return `1`, `0` or `-1` instead of boolean
+
 ## [2.2.7] - 2021-03-19
 ### Updated
 - Fixed Helper test namespace not matching PSR-0/PSR-4
