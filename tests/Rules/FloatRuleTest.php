@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\FloatRule;
 use PHPUnit\Framework\TestCase;
@@ -13,28 +11,36 @@ class FloatRuleTest extends TestCase
     {
         return [
             [
-                0.0, true
+                0.0,
+                true,
             ],
             [
-                1.0, true
+                1.0,
+                true,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                1, false
+                1,
+                false,
             ],
             [
-                '123', false
+                '123',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                [], false
+                [],
+                false,
             ],
         ];
     }

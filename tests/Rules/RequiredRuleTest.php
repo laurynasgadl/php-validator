@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\RequiredRule;
 use PHPUnit\Framework\TestCase;
@@ -13,25 +11,25 @@ class RequiredRuleTest extends TestCase
     {
         return [
             [
-                'test'
+                'test',
             ],
             [
-                0
+                0,
             ],
             [
-                1
+                1,
             ],
             [
-                0.2
+                0.2,
             ],
             [
-                true
+                true,
             ],
             [
-                false
+                false,
             ],
             [
-                []
+                [],
             ],
         ];
     }

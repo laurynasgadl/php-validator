@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Luur\Validator\Exceptions;
 
 class ValidationFailed extends ValidatorException

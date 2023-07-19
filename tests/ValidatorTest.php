@@ -6,7 +6,6 @@ use Luur\Validator\Context;
 use Luur\Validator\ContextInterface;
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\ValidationFailed;
-use Luur\Validator\Rules\AbstractRule;
 use Luur\Validator\Rules\Concrete\IntegerRule;
 use Luur\Validator\Rules\Concrete\RequiredRule;
 use Luur\Validator\Tests\Rules\TestRule;
@@ -20,11 +19,11 @@ class ValidatorTest extends TestCase
         $validator = $this->createValidatorMock();
 
         $rules = [
-            'test.test'      => 'test',
-            'test1'          => 'test',
-            'test2'          => 'test',
+            'test.test' => 'test',
+            'test1' => 'test',
+            'test2' => 'test',
             'test.test.test' => 'test',
-            'test3'          => 'test',
+            'test3' => 'test',
         ];
 
         $sorted = $validator->mockSortRules($rules);
@@ -38,7 +37,7 @@ class ValidatorTest extends TestCase
         $validator = $this->createValidatorMock();
 
         $params = ['test' => 'test'];
-        $rules  = ['test' => 'integer|required'];
+        $rules = ['test' => 'integer|required'];
 
         $validator->setParams($params);
 
@@ -59,6 +58,7 @@ class ValidatorTest extends TestCase
 
     public function testSetsContextHandler()
     {
+        $this->expectNotToPerformAssertions();
         $validator = $this->createValidatorMock();
         $validator->setContextHandler(new Context());
     }
@@ -89,15 +89,15 @@ class ValidatorTest extends TestCase
 
         $params = [
             'test' => [
-                'test'  => -10,
+                'test' => -10,
                 'test1' => 'test',
                 'test2' => 1.1,
             ],
         ];
 
         $result = $validator->validate([
-            'test'       => 'array|required',
-            'test.test'  => 'integer|required|min:-100|max:125|between:-25,125',
+            'test' => 'array|required',
+            'test.test' => 'integer|required|min:-100|max:125|between:-25,125',
             'test.test1' => 'string|required|size:4',
             'test.test2' => 'float|required',
             'test.test3' => 'float',
@@ -112,14 +112,14 @@ class ValidatorTest extends TestCase
 
         $params = [
             'test' => [
-                'test'  => 123,
+                'test' => 123,
                 'test1' => 123,
             ],
         ];
 
         $result = $validator->validate([
-            'test'       => ['array', new RequiredRule()],
-            'test.test'  => new IntegerRule(),
+            'test' => ['array', new RequiredRule()],
+            'test.test' => new IntegerRule(),
             'test.test1' => 'min:100',
         ], $params);
 
@@ -150,7 +150,7 @@ class ValidatorTest extends TestCase
                     'id' => 2,
                 ],
             ],
-            'test_assoc'   => [
+            'test_assoc' => [
                 '1' => [
                     'id' => 3,
                 ],
@@ -162,9 +162,9 @@ class ValidatorTest extends TestCase
         ];
 
         $result = $validator->validate([
-            '*.*.id'            => new IntegerRule(),
+            '*.*.id' => new IntegerRule(),
             'test_assoc.2.name' => 'string',
-            '*.2'               => 'array',
+            '*.2' => 'array',
         ], $params);
 
         $this->assertEquals($result, $params);
@@ -176,7 +176,7 @@ class ValidatorTest extends TestCase
 
         $validator = $this->createValidator();
         $validator->validate([
-            'test'  => 'required|integer',
+            'test' => 'required|integer',
             'test2' => 'required|string',
             'test3' => 'required|float',
         ], []);
@@ -197,10 +197,10 @@ class ValidatorTest extends TestCase
     public function testValidatesNestedValues()
     {
         $rules = [
-            'arg_3'         => 'required|array',
-            'arg_5'         => 'required|array',
-            'arg_5.arg_3'   => 'string',
-            'arg_1'         => 'required|array',
+            'arg_3' => 'required|array',
+            'arg_5' => 'required|array',
+            'arg_5.arg_3' => 'string',
+            'arg_1' => 'required|array',
             'arg_1.*.arg_1' => 'string',
         ];
 
@@ -211,7 +211,7 @@ class ValidatorTest extends TestCase
         ];
 
         $validator = new Validator();
-        $result    = $validator->validate($rules, $params);
+        $result = $validator->validate($rules, $params);
 
         $this->assertEquals($result, $params);
     }
@@ -237,12 +237,12 @@ class ValidatorTest extends TestCase
 
     public function testSkipsNestedRequiredParams()
     {
-        $rules  = [
-            'arg_1'       => 'required|array',
+        $rules = [
+            'arg_1' => 'required|array',
             'arg_1.arg_1' => 'integer',
-            'arg_2'       => 'array',
+            'arg_2' => 'array',
             'arg_2.arg_1' => 'required|string',
-            'arg_3'       => 'array',
+            'arg_3' => 'array',
             'arg_3.arg_1' => 'required|string',
         ];
         $params = [
@@ -255,13 +255,13 @@ class ValidatorTest extends TestCase
         ];
 
         $validator = new Validator();
-        $result    = $validator->validate($rules, $params);
+        $result = $validator->validate($rules, $params);
         $this->assertEquals($params, $result);
     }
 
     public function testValidatesRequiredWithoutRule()
     {
-        $rules  = [
+        $rules = [
             'arg_1' => 'required_without:arg_2,arg_3|string',
         ];
         $params = [
@@ -270,7 +270,7 @@ class ValidatorTest extends TestCase
         ];
 
         $validator = new Validator();
-        $result    = $validator->validate($rules, $params);
+        $result = $validator->validate($rules, $params);
         $this->assertEquals($params, $result);
     }
 
@@ -279,7 +279,7 @@ class ValidatorTest extends TestCase
         $this->expectException(ValidationFailed::class);
         $this->expectExceptionMessage('<arg_1> failed [required_without:arg_2,arg_3] rule validation');
 
-        $rules  = [
+        $rules = [
             'arg_1' => 'required_without:arg_2,arg_3',
         ];
         $params = [
@@ -292,7 +292,7 @@ class ValidatorTest extends TestCase
 
     public function testValidatesRequiredWithRule()
     {
-        $rules  = [
+        $rules = [
             'arg_1' => 'required_with:arg_2,arg_3|string',
         ];
         $params = [
@@ -301,7 +301,7 @@ class ValidatorTest extends TestCase
         ];
 
         $validator = new Validator();
-        $result    = $validator->validate($rules, $params);
+        $result = $validator->validate($rules, $params);
         $this->assertEquals($params, $result);
     }
 
@@ -310,7 +310,7 @@ class ValidatorTest extends TestCase
         $this->expectException(ValidationFailed::class);
         $this->expectExceptionMessage('<arg_1> failed [required_with:arg_2,arg_3] rule validation');
 
-        $rules  = [
+        $rules = [
             'arg_1' => 'required_with:arg_2,arg_3',
         ];
         $params = [
@@ -324,14 +324,14 @@ class ValidatorTest extends TestCase
 
     public function testReturnsCustomValidationMessageSetFromConstructor()
     {
-        $message  = 'Option key should be a string';
-        $rules    = ['options.*.key' => 'required|string'];
+        $message = 'Option key should be a string';
+        $rules = ['options.*.key' => 'required|string'];
         $messages = ['options.*.key.string' => $message];
 
         $params = [
             'options' => [
                 [
-                    'key'   => ['passes'],
+                    'key' => ['passes'],
                     'value' => false,
                 ],
             ],
@@ -346,18 +346,18 @@ class ValidatorTest extends TestCase
 
     public function testReturnsCustomValidationMessageSetFromMethod()
     {
-        $message  = 'Option key should be a string';
-        $rules    = ['options.*.key' => 'required|string'];
+        $message = 'Option key should be a string';
+        $rules = ['options.*.key' => 'required|string'];
         $messages = ['options.*.key.string' => $message];
 
         $params = [
             'options' => [
                 [
-                    'key'   => 'passes',
+                    'key' => 'passes',
                     'value' => true,
                 ],
                 [
-                    'key'   => ['passes'],
+                    'key' => ['passes'],
                     'value' => false,
                 ],
             ],
@@ -383,13 +383,13 @@ class ValidatorTest extends TestCase
     public function testSetsDefaultValueOfNonExistingParam()
     {
         $validator = new Validator();
-        $rules     = [
+        $rules = [
             'client.details.id' => ['default:test'],
         ];
-        $result    = $validator->validate($rules, ['username' => 123]);
+        $result = $validator->validate($rules, ['username' => 123]);
         self::assertEquals([
             'username' => 123,
-            'client'   => [
+            'client' => [
                 'details' => [
                     'id' => 'test',
                 ],
@@ -400,37 +400,37 @@ class ValidatorTest extends TestCase
     public function testDefaultOverridesNullValue()
     {
         $validator = new Validator();
-        $rules     = [
+        $rules = [
             'username' => ['default:test'],
         ];
-        $result    = $validator->validate($rules, ['username' => null]);
+        $result = $validator->validate($rules, ['username' => null]);
         self::assertEquals(['username' => 'test'], $result);
     }
 
     public function testHandlesRequiredAndDefaultRuleCombo()
     {
         $validator = new Validator();
-        $rules     = [
+        $rules = [
             'username' => 'required|default:test|string',
         ];
-        $result    = $validator->validate($rules, []);
+        $result = $validator->validate($rules, []);
         self::assertEquals(['username' => 'test'], $result);
     }
 
     public function testGetsValidatedParams()
     {
-        $rules  = [
-            'arg_1'               => 'required_with:arg_2,arg_3|array',
-            'arg_2'               => 'default:test|string',
-            'arg_3'               => 'required|string',
-            'arg_4.include.*'     => 'array',
+        $rules = [
+            'arg_1' => 'required_with:arg_2,arg_3|array',
+            'arg_2' => 'default:test|string',
+            'arg_3' => 'required|string',
+            'arg_4.include.*' => 'array',
             'arg_4.include.*.key' => 'required|integer',
         ];
         $params = [
             'arg_2' => null,
             'arg_3' => 'test2',
             'arg_4' => [
-                'ignore'  => true,
+                'ignore' => true,
                 'include' => [
                     [
                         'key' => 1,

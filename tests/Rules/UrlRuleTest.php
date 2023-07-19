@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\UrlRule;
 use PHPUnit\Framework\TestCase;
@@ -13,49 +11,64 @@ class UrlRuleTest extends TestCase
     {
         return [
             [
-                0.0, false
+                0.0,
+                false,
             ],
             [
-                1.0, false
+                1.0,
+                false,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                1, false
+                1,
+                false,
             ],
             [
-                '123', false
+                '123',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                [], false
+                [],
+                false,
             ],
             [
-                'test', false
+                'test',
+                false,
             ],
             [
-                'www.test', false
+                'www.test',
+                false,
             ],
             [
-                'test.com', false
+                'test.com',
+                false,
             ],
             [
-                'http://test', true
+                'http://test',
+                true,
             ],
             [
-                'http://test.com', true
+                'http://test.com',
+                true,
             ],
             [
-                'https://www.test.com/api/test?test=true', true
+                'https://www.test.com/api/test?test=true',
+                true,
             ],
             [
-                'https://www.test.com api/test?test=true', false
+                'https://www.test.com api/test?test=true',
+                false,
             ],
         ];
     }

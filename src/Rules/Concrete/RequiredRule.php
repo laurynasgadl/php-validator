@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Rules\Concrete;
-
 
 use Luur\Validator\Rules\AbstractRule;
 

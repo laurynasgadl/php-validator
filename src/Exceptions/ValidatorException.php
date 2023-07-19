@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Exceptions;
-
 
 use Exception;
 

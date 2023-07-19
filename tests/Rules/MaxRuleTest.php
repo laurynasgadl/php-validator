@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\MaxRule;
 use PHPUnit\Framework\TestCase;
@@ -13,42 +11,63 @@ class MaxRuleTest extends TestCase
     {
         return [
             [
-                '1234567890', false
+                '1234567890',
+                false,
             ],
             [
-                10, false
+                10,
+                false,
             ],
             [
                 [
-                    1,2,3,4,5,6,7,8,9,0
-                ], false
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    0,
+                ],
+                false,
             ],
             [
-                10.0, false
+                10.0,
+                false,
             ],
             [
-                1.1, true
+                1.1,
+                true,
             ],
             [
-                '123', true
+                '123',
+                true,
             ],
             [
-                null, true
+                null,
+                true,
             ],
             [
-                true, true
+                true,
+                true,
             ],
             [
-                false, true
+                false,
+                true,
             ],
             [
-                1, true
+                1,
+                true,
             ],
             [
-                [1], true
+                [1],
+                true,
             ],
             [
-                -10, true
+                -10,
+                true,
             ],
         ];
     }

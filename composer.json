@@ -1,38 +1,43 @@
 {
-  "name": "laurynasgadl/php-validator",
-  "type": "library",
-  "description": "Array value validation library for PHP",
-  "keywords": ["php","array","validation","validator"],
-  "license": "MIT",
-  "authors": [
-      {
-          "name": "Laurynas Gadliauskas",
-          "homepage": "https://github.com/laurynasgadl"
-      }
-  ],
-  "require": {
-    "php": ">=7.0",
-    "laurynasgadl/travers": "^1.1"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^5.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "Luur\\Validator\\": "src/"
+    "name": "laurynasgadl/php-validator",
+    "type": "library",
+    "description": "Array value validation library for PHP",
+    "keywords": [
+        "php",
+        "array",
+        "validation",
+        "validator"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laurynas Gadliauskas",
+            "homepage": "https://github.com/laurynasgadl"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "laurynasgadl/travers": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Luur\\Validator\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Luur\\Validator\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Luur\\Validator\\Tests\\": "tests/"
-    }
-  },
-  "config": {
-    "sort-packages": true
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.0.x-dev"
-    }
-  }
 }

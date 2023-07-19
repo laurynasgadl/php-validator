@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Context;
 use Luur\Validator\Rules\Concrete\DefaultRule;
@@ -10,9 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class DefaultRuleTest extends TestCase
 {
+    /**
+     * @var Context $context
+     */
     protected $context;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->context = new Context([
@@ -24,7 +25,7 @@ class DefaultRuleTest extends TestCase
     public function testSetsDefaultOnNull()
     {
         $defaultValue = 123.123;
-        $rule         = new DefaultRule($defaultValue);
+        $rule = new DefaultRule($defaultValue);
         $rule->setContext($this->context);
 
         $this->assertTrue($rule->passes('test1'));
@@ -34,7 +35,7 @@ class DefaultRuleTest extends TestCase
     public function testSetsDefaultOnNonSet()
     {
         $defaultValue = 123.123;
-        $rule         = new DefaultRule($defaultValue);
+        $rule = new DefaultRule($defaultValue);
         $rule->setContext($this->context);
 
         $this->assertTrue($rule->passes('test2.test1'));

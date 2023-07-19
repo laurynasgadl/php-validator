@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\ArrayRule;
 use PHPUnit\Framework\TestCase;
@@ -13,22 +11,28 @@ class ArrayRuleTest extends TestCase
     {
         return [
             [
-                [], true
+                [],
+                true,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                [1,2,3], true
+                [1, 2, 3],
+                true,
             ],
             [
-                'test', false
+                'test',
+                false,
             ],
             [
-                1.1, false
+                1.1,
+                false,
             ],
             [
-                123, false
+                123,
+                false,
             ],
         ];
     }

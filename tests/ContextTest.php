@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests;
-
 
 use Luur\Validator\Context;
 use PHPUnit\Framework\TestCase;
@@ -12,7 +10,7 @@ class ContextTest extends TestCase
     public function testCreatesContext()
     {
         $context = new Context();
-        $this->assertTrue($context instanceof Context);
+        $this->assertInstanceOf(Context::class, $context);
     }
 
     public function testGetsValueByKey()

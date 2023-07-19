@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\EmailRule;
 use PHPUnit\Framework\TestCase;
@@ -13,43 +11,56 @@ class EmailRuleTest extends TestCase
     {
         return [
             [
-                0.0, false
+                0.0,
+                false,
             ],
             [
-                1.0, false
+                1.0,
+                false,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                1, false
+                1,
+                false,
             ],
             [
-                '123', false
+                '123',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                [], false
+                [],
+                false,
             ],
             [
-                'test@', false
+                'test@',
+                false,
             ],
             [
-                '@test', false
+                '@test',
+                false,
             ],
             [
-                '@test.com', false
+                '@test.com',
+                false,
             ],
             [
-                'test@test.com', true
+                'test@test.com',
+                true,
             ],
             [
-                'test.test@test.com', true
+                'test.test@test.com',
+                true,
             ],
         ];
     }

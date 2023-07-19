@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\BetweenRule;
 use PHPUnit\Framework\TestCase;
@@ -13,42 +11,64 @@ class BetweenRuleTest extends TestCase
     {
         return [
             [
-                '12345678901', false
+                '12345678901',
+                false,
             ],
             [
-                11, false
+                11,
+                false,
             ],
             [
                 [
-                    1,2,3,4,5,6,7,8,9,0,1
-                ], false
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    0,
+                    1,
+                ],
+                false,
             ],
             [
-                11.0, false
+                11.0,
+                false,
             ],
             [
-                5.1, true
+                5.1,
+                true,
             ],
             [
-                '12345', true
+                '12345',
+                true,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                1, false
+                1,
+                false,
             ],
             [
-                [1], false
+                [1],
+                false,
             ],
             [
-                -10, false
+                -10,
+                false,
             ],
         ];
     }

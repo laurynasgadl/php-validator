@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\NumericRule;
 use PHPUnit\Framework\TestCase;
@@ -13,28 +11,36 @@ class NumericRuleTest extends TestCase
     {
         return [
             [
-                0, true
+                0,
+                true,
             ],
             [
-                1, true
+                1,
+                true,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                1.1, true
+                1.1,
+                true,
             ],
             [
-                '123', true
+                '123',
+                true,
             ],
             [
-                'abcd', false
+                'abcd',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
         ];
     }

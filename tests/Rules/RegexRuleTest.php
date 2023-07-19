@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\RegexRule;
 use PHPUnit\Framework\TestCase;
@@ -13,31 +11,49 @@ class RegexRuleTest extends TestCase
     {
         return [
             [
-                '/^[A-Za-z]+$/', 'Test', true
+                '/^[A-Za-z]+$/',
+                'Test',
+                true,
             ],
             [
-                '/^[0-9]+$/', '123', true
+                '/^[0-9]+$/',
+                '123',
+                true,
             ],
             [
-                '/^[0-9A-Za-z\-_]+$/', 'test123_', true
+                '/^[0-9A-Za-z\-_]+$/',
+                'test123_',
+                true,
             ],
             [
-                '/^_$/', '_', true
+                '/^_$/',
+                '_',
+                true,
             ],
             [
-                '/^[0-9]+$/', 123, true
+                '/^[0-9]+$/',
+                123,
+                true,
             ],
             [
-                '/^[0-9]+$/', null, false
+                '/^[0-9]+$/',
+                null,
+                false,
             ],
             [
-                '/^[a-z]+$/', '!test', false
+                '/^[a-z]+$/',
+                '!test',
+                false,
             ],
             [
-                '/^[0-9]+$/', 1.1, false
+                '/^[0-9]+$/',
+                1.1,
+                false,
             ],
             [
-                '/^[\-_]+$/', '?!123', false
+                '/^[\-_]+$/',
+                '?!123',
+                false,
             ],
         ];
     }

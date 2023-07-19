@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\AlphaDashRule;
 use PHPUnit\Framework\TestCase;
@@ -13,31 +11,40 @@ class AlphaDashRuleTest extends TestCase
     {
         return [
             [
-                'Test', true
+                'Test',
+                true,
             ],
             [
-                '123', true
+                '123',
+                true,
             ],
             [
-                'test123_', true
+                'test123_',
+                true,
             ],
             [
-                '_', true
+                '_',
+                true,
             ],
             [
-                123, true
+                123,
+                true,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                '!test', false
+                '!test',
+                false,
             ],
             [
-                1.1, false
+                1.1,
+                false,
             ],
             [
-                '?!123', false
+                '?!123',
+                false,
             ],
         ];
     }
