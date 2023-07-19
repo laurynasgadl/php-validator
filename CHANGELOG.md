@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.0] - 2023-07-19
+### Updated
+- Updated dependencies to support PHP 8.0
+
 ## [2.3.0] - 2022-02-08
 ### Updated
 - Changed PHP sort functions to return `1`, `0` or `-1` instead of boolean

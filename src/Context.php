@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator;
-
 
 use Luur\Exceptions\BranchNotFoundException;
 use Luur\Travers;

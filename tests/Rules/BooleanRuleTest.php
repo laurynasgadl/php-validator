@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\BooleanRule;
 use PHPUnit\Framework\TestCase;
@@ -13,28 +11,36 @@ class BooleanRuleTest extends TestCase
     {
         return [
             [
-                0.0, false
+                0.0,
+                false,
             ],
             [
-                1.0, false
+                1.0,
+                false,
             ],
             [
-                false, true
+                false,
+                true,
             ],
             [
-                true, true
+                true,
+                true,
             ],
             [
-                1, false
+                1,
+                false,
             ],
             [
-                '123', false
+                '123',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                [], false
+                [],
+                false,
             ],
         ];
     }

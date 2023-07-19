@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Rules;
-
 
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\RuleRegistryException;

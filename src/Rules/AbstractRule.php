@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Rules;
-
 
 use Luur\Validator\Tools\Helpers;
 use Luur\Validator\ContextInterface;

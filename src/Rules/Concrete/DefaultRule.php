@@ -1,11 +1,9 @@
 <?php
 
-
 namespace Luur\Validator\Rules\Concrete;
 
 use Luur\Validator\ContextInterface;
 use Luur\Validator\Rules\AbstractRule;
-
 
 class DefaultRule extends AbstractRule
 {

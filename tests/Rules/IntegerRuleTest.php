@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\IntegerRule;
 use PHPUnit\Framework\TestCase;
@@ -13,25 +11,32 @@ class IntegerRuleTest extends TestCase
     {
         return [
             [
-                0, true
+                0,
+                true,
             ],
             [
-                1, true
+                1,
+                true,
             ],
             [
-                false, false
+                false,
+                false,
             ],
             [
-                true, false
+                true,
+                false,
             ],
             [
-                1.1, false
+                1.1,
+                false,
             ],
             [
-                '123', false
+                '123',
+                false,
             ],
             [
-                null, false
+                null,
+                false,
             ],
         ];
     }

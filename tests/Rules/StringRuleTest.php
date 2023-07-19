@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\StringRule;
 use PHPUnit\Framework\TestCase;
@@ -13,25 +11,32 @@ class StringRuleTest extends TestCase
     {
         return [
             [
-                'test', true
+                'test',
+                true,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                '123', true
+                '123',
+                true,
             ],
             [
-                [], false
+                [],
+                false,
             ],
             [
-                1.1, true
+                1.1,
+                true,
             ],
             [
-                123, true
+                123,
+                true,
             ],
             [
-                0, true
+                0,
+                true,
             ],
         ];
     }

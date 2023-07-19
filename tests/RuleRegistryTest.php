@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests;
-
 
 use Luur\Validator\Exceptions\InvalidRule;
 use Luur\Validator\Exceptions\RuleRegistryException;
@@ -16,7 +14,7 @@ class RuleRegistryTest extends TestCase
     public function testBuildsRegistry()
     {
         $registry = new RuleRegistry();
-        self::assertTrue($registry instanceof RuleRegistry);
+        $this->assertInstanceOf(RuleRegistry::class, $registry);
     }
 
     public function testRegistersRule()
@@ -24,16 +22,16 @@ class RuleRegistryTest extends TestCase
         $registry = new RuleRegistry();
         $registry->register(ArrayRule::getSlug(), ArrayRule::class);
         $rule = $registry->find(ArrayRule::getSlug());
-        self::assertEquals(ArrayRule::class, $rule);
+        $this->assertEquals(ArrayRule::class, $rule);
     }
 
     public function testThrowsExceptionOnSameSlug()
     {
         $slug = ArrayRule::getSlug();
 
-        self::expectException(RuleRegistryException::class);
-        self::expectExceptionMessage("Rule [$slug] already registered");
-        self::expectExceptionCode(434);
+        $this->expectException(RuleRegistryException::class);
+        $this->expectExceptionMessage("Rule [$slug] already registered");
+        $this->expectExceptionCode(434);
 
         $registry = new RuleRegistry();
         $registry->register($slug, ArrayRule::class);
@@ -49,16 +47,16 @@ class RuleRegistryTest extends TestCase
         $registry->register($slug, ArrayRule::class);
         $rule = $registry->find(ArrayRule::getSlug());
 
-        self::assertEquals(ArrayRule::class, $rule);
+        $this->assertEquals(ArrayRule::class, $rule);
     }
 
     public function testThrowsExceptionOnUnregisteredRule()
     {
         $slug = 'test';
 
-        self::expectException(InvalidRule::class);
-        self::expectExceptionMessage("Invalid rule provided [{$slug}]");
-        self::expectExceptionCode(431);
+        $this->expectException(InvalidRule::class);
+        $this->expectExceptionMessage("Invalid rule provided [{$slug}]");
+        $this->expectExceptionCode(431);
 
         $registry = new RuleRegistry();
         $registry->find($slug);

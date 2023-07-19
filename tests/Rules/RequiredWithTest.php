@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Context;
 use Luur\Validator\Rules\Concrete\RequiredWithRule;
@@ -21,7 +19,7 @@ class RequiredWithTest extends TestCase
                 ]),
                 [
                     'test2',
-                    'test3'
+                    'test3',
                 ],
                 'test1',
             ],
@@ -32,7 +30,7 @@ class RequiredWithTest extends TestCase
                     'test3' => 3,
                 ]),
                 [
-                    'test3'
+                    'test3',
                 ],
                 'test1',
             ],
@@ -60,7 +58,7 @@ class RequiredWithTest extends TestCase
                 ]),
                 [
                     'test2',
-                    'test3'
+                    'test3',
                 ],
                 'test1',
             ],
@@ -68,7 +66,7 @@ class RequiredWithTest extends TestCase
                 new Context([
                     'test1' => [
                         'test22' => 22,
-                    ]
+                    ],
                 ]),
                 [
                     'test1.test22',

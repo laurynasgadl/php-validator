@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Luur\Validator\Tests\Rules;
-
 
 use Luur\Validator\Rules\Concrete\AlphaNumericRule;
 use PHPUnit\Framework\TestCase;
@@ -13,34 +11,44 @@ class AlphaNumericRuleTest extends TestCase
     {
         return [
             [
-                'Test', true
+                'Test',
+                true,
             ],
             [
-                '123', true
+                '123',
+                true,
             ],
             [
-                123, true
+                123,
+                true,
             ],
             [
-                null, false
+                null,
+                false,
             ],
             [
-                '!test', false
+                '!test',
+                false,
             ],
             [
-                1.1, false
+                1.1,
+                false,
             ],
             [
-                '?!123', false
+                '?!123',
+                false,
             ],
             [
-                'test123_', false
+                'test123_',
+                false,
             ],
             [
-                'test123-', false
+                'test123-',
+                false,
             ],
             [
-                '_', false
+                '_',
+                false,
             ],
         ];
     }
